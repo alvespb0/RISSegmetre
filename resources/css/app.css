@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-size: 16px;
+  /* Off-White background para reduzir cansaço visual */
+  --background: #fafaf9;
+  /* Slate Gray para textos */
+  --foreground: #475569;
+  --card: #ffffff;
+  --card-foreground: #475569;
+  --popover: #ffffff;
+  --popover-foreground: #475569;
+  /* Verde Esmeralda para ações principais */
+  --primary: #10b981;
+  --primary-foreground: #ffffff;
+  /* Verde Musgo como secundário */
+  --secondary: #84cc16;
+  --secondary-foreground: #1e293b;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #e2e8f0;
+  --accent-foreground: #1e293b;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  /* Slate Gray para bordas */
+  --border: #cbd5e1;
+  --input: transparent;
+  --input-background: #f8fafc;
+  --switch-background: #cbd5e1;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #10b981;
+  /* Cores para badges de status */
+  --status-laudado: #10b981;
+  --status-pendente: #eab308;
+  --status-rejeitado: #ef4444;
+  --status-urgente: #f97316;
+  --radius: 0.625rem;
+  /* Sidebar em tons de Verde Esmeralda suave */
+  --sidebar: #f0fdf4;
+  --sidebar-foreground: #1e293b;
+  --sidebar-primary: #10b981;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #dcfce7;
+  --sidebar-accent-foreground: #166534;
+  --sidebar-border: #d1fae5;
+  --sidebar-ring: #10b981;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  }
+
+  html {
+    font-size: var(--font-size);
+  }
+}
