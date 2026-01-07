@@ -16,28 +16,39 @@
 
         <!-- Filtros rápidos -->
         <div class="flex gap-3 mb-6 flex-wrap">
-            <a
-                href="{{ route('exames.index', ['filtro' => 'todos']) }}"
-                class="px-4 py-2 rounded-lg transition-colors {{ $filtro === 'todos' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground border border-border hover:bg-accent' }}"
-            >
+            @php
+                $filtroTodosClasses = $filtro === 'todos' 
+                    ? 'px-4 py-2 rounded-lg transition-colors bg-primary text-primary-foreground'
+                    : 'px-4 py-2 rounded-lg transition-colors bg-card text-foreground border border-border hover:bg-accent';
+            @endphp
+            <a href="{{ route('exames.index', ['filtro' => 'todos']) }}" class="{{ $filtroTodosClasses }}">
                 Todos os Exames
             </a>
-            <a
-                href="{{ route('exames.index', ['filtro' => 'pendentes']) }}"
-                class="px-4 py-2 rounded-lg transition-colors {{ $filtro === 'pendentes' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground border border-border hover:bg-accent' }}"
-            >
+
+            @php
+                $filtroPendentesClasses = $filtro === 'pendentes' 
+                    ? 'px-4 py-2 rounded-lg transition-colors bg-primary text-primary-foreground'
+                    : 'px-4 py-2 rounded-lg transition-colors bg-card text-foreground border border-border hover:bg-accent';
+            @endphp
+            <a href="{{ route('exames.index', ['filtro' => 'pendentes']) }}" class="{{ $filtroPendentesClasses }}">
                 Pendentes Hoje
             </a>
-            <a
-                href="{{ route('exames.index', ['filtro' => 'urgentes']) }}"
-                class="px-4 py-2 rounded-lg transition-colors {{ $filtro === 'urgentes' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground border border-border hover:bg-accent' }}"
-            >
+
+            @php
+                $filtroUrgentesClasses = $filtro === 'urgentes' 
+                    ? 'px-4 py-2 rounded-lg transition-colors bg-primary text-primary-foreground'
+                    : 'px-4 py-2 rounded-lg transition-colors bg-card text-foreground border border-border hover:bg-accent';
+            @endphp
+            <a href="{{ route('exames.index', ['filtro' => 'urgentes']) }}" class="{{ $filtroUrgentesClasses }}">
                 Urgentes
             </a>
-            <a
-                href="{{ route('exames.index', ['filtro' => 'meus']) }}"
-                class="px-4 py-2 rounded-lg transition-colors {{ $filtro === 'meus' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground border border-border hover:bg-accent' }}"
-            >
+
+            @php
+                $filtroMeusClasses = $filtro === 'meus' 
+                    ? 'px-4 py-2 rounded-lg transition-colors bg-primary text-primary-foreground'
+                    : 'px-4 py-2 rounded-lg transition-colors bg-card text-foreground border border-border hover:bg-accent';
+            @endphp
+            <a href="{{ route('exames.index', ['filtro' => 'meus']) }}" class="{{ $filtroMeusClasses }}">
                 Meus Laudos
             </a>
         </div>

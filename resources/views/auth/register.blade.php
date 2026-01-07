@@ -66,6 +66,25 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
+        <!-- Tipo de Usuário -->
+        <div>
+            <x-input-label for="tipo" :value="__('Tipo de usuário')" />
+            <select 
+                id="tipo" 
+                name="tipo" 
+                required
+                class="w-full px-4 py-2.5 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+            >
+                <option value="">Selecione o tipo</option>
+                <option value="admin" {{ old('tipo') === 'admin' ? 'selected' : '' }}>Administrador</option>
+                <option value="medico" {{ old('tipo') === 'medico' ? 'selected' : '' }}>Médico</option>
+                <option value="tecnico" {{ old('tipo') === 'tecnico' ? 'selected' : '' }}>Técnico</option>
+                <option value="paciente" {{ old('tipo') === 'paciente' ? 'selected' : '' }}>Paciente</option>
+                <option value="dev" {{ old('tipo') === 'dev' ? 'selected' : '' }}>Desenvolvedor</option>
+            </select>
+            <x-input-error :messages="$errors->get('tipo')" class="mt-2" />
+        </div>
+
         <div class="pt-2">
             <x-primary-button class="w-full">
                 {{ __('Criar conta') }}
