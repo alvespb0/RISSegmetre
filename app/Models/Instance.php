@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Instance extends Model
+{
+    protected $table = 'instances';
+
+    use HasFactory;
+
+    protected $fillable = [
+        'serie_id',
+        'instance_external_id',
+        'file_uuid',
+    ];
+
+    public function serie(){
+        return $this->belongsTo(Serie::class, 'serie_id');
+    }
+}
