@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nome');
             $table->text('patient_external_id')->unique();
             $table->date('birth_date')->nullable();
-            $table->enum('sexo', ['masculino', 'feminino'])->nullable();
+            $table->enum('sexo', ['F', 'M'])->nullable();
             $table->timestamps();
         });
     }
