@@ -10,8 +10,17 @@ use App\Models\Instance;
 
 use Carbon\Carbon;
 
+/**
+ * Serviço responsável pela integração com o servidor DICOM Orthanc.
+ * * Realiza o consumo da API REST do Orthanc para sincronizar Pacientes, 
+ * Estudos, Séries e Instâncias com o banco de dados local.
+ */
 class OrthancService
 {
+    /**
+     * Obtém todos os estudos do Orthanc e sincroniza recursivamente com o banco local.
+     * * @return bool Retorna true em caso de sucesso ou false/null em caso de falha.
+     */
     public function getStudies(){
         $endPoint = env('ORTHANC_SERVER').'/studies';
 
@@ -78,6 +87,12 @@ class OrthancService
         }
     }
 
+    /**
+     * Obtém e salva os dados de uma Série específica.
+     * @param int $studyId ID interno do estudo no banco de dados.
+     * @param string $serieId ID externo (UUID) da série no Orthanc.
+     * @return bool
+     */
     public function getSeries($studyId, $serieId){
         $endPoint = env('ORTHANC_SERVER').'/series'.'/'.$serieId;
 
@@ -110,6 +125,12 @@ class OrthancService
         }
     }
 
+    /**
+     * Obtém e salva os dados de uma Instância (imagem/arquivo) específica.
+     * * @param int $serieId ID interno da série no banco de dados.
+     * @param string $instanceId ID externo (UUID) da instância no Orthanc.
+     * @return bool
+     */
     public function getInstance($serieId, $instanceId){
         $endPoint = env('ORTHANC_SERVER').'/instances'.'/'.$instanceId;
 
@@ -119,13 +140,13 @@ class OrthancService
             ]);
 
             if(!$response->ok()){
-                \Log::error('Não localizado instância para endpoint informado.', ['endpoint' => $endpoint]);
+                \Log::error('Não localizado instância para endpoint informado.', ['endpoint' => $endPoint]);
                 return false;
             }
            
             $data = $response->json();
             Instance::updateOrCreate(
-                ['instance_external_id' => $serieId],
+                ['instance_external_id' => $instanceId],
                 [
                     'serie_id' => $serieId,
                     'file_uuid' => $data['FileUuid']
