@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Instance;
+use Illuminate\Support\Facades\URL;
+
 use Illuminate\Support\Facades\Log;
 
 class InstancesList extends Component
@@ -49,6 +51,13 @@ class InstancesList extends Component
             Log::error('Erro ao liberar instância: ' . $this->instance->id . ', erro: '. $e->getMessage());
             $this->dispatch('toast-error', message: 'Erro ao liberar: ' . $e->getMessage());
         }
+    }
+
+    public function downloadDCM(){
+        $url = route('baixar.dicom', ['id' => $this->instance->instance_external_id]);
+
+        // O Livewire trata o redirecionamento de download automaticamente
+        return redirect()->to($url);
     }
 
     public function render()

@@ -43,8 +43,8 @@ Route::middleware(['checkUserType:admin,dev,medico,tecnico'])->group(function ()
     })->name('configuracoes.index');
 });
 
-Route::middleware(['checkUserType:admin,dev,tecnico'])->controller(ExameController::class)->group(function (){
-    Route::post('/exames/salvar-anamnese', '')->name('exames.anamnese');
+Route::middleware(['checkUserType:admin,dev,tecnico,medico'])->controller(ExameController::class)->group(function (){
+    Route::get('/exames/baixar-dicom/{id}', 'getDicomFile')->name('baixar.dicom');
 });
 
 Route::middleware('auth')->group(function () {
