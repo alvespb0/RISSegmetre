@@ -20,7 +20,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware(['checkUserType:admin,dev'])->group(function () {
+Route::middleware(['checkUserType:admin,dev,medico,tecnico'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/exames', [ExameController::class, 'index'])->name('exames.index');
@@ -41,6 +41,10 @@ Route::middleware(['checkUserType:admin,dev'])->group(function () {
     Route::get('/configuracoes', function () {
         return view('configuracoes.index');
     })->name('configuracoes.index');
+});
+
+Route::middleware(['checkUserType:admin,dev,tecnico'])->controller(ExameController::class)->group(function (){
+    Route::post('/exames/salvar-anamnese', '')->name('exames.anamnese');
 });
 
 Route::middleware('auth')->group(function () {
