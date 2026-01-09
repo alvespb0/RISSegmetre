@@ -23,6 +23,6 @@ class Serie extends Model
     } 
 
     public function instance(){
-        return $this->hasMany(Instance::class, 'instance_id');
+        return $this->hasMany(Instance::class, 'serie_id');
     }
 }

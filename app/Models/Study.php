@@ -15,10 +15,8 @@ class Study extends Model
         'patient_id',
         'study_external_id',
         'study_instance_id',
-        'anamnese',
         'solicitante',
         'study_date',
-        'liberado_tec'
     ];
 
     public function patient(){

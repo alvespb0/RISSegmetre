@@ -16,10 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('patient_id');
             $table->text('study_external_id')->unique();
             $table->text('study_instance_id');
-            $table->text('anamnese')->nullable();
             $table->string('solicitante');
             $table->date('study_date');
-            $table->boolean('liberado_tec')->default(false); #liberado pelo técnico para DRA visualizar
             $table->foreign('patient_id')->references('id')->on('patients')->onDelete('cascade');
             $table->timestamps();
         });
