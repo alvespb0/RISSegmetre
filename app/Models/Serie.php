@@ -17,6 +17,7 @@ class Serie extends Model
         'medico_id',
         'modality', #enum
         'laudo',
+        'laudo_path',
         'body_part_examined'
     ];
 

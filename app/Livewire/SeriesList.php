@@ -8,6 +8,8 @@ use Livewire\Component;
 use App\Models\Serie;
 use App\Models\Instance;
 
+use App\Services\LaudoService;
+
 class SeriesList extends Component
 {
 
@@ -31,11 +33,15 @@ class SeriesList extends Component
                 'medico_id' => Auth::id()
             ]);
             
-            $this->serie->instance()->update([
-                'status' => 'laudado'
+            $service = new LaudoService;
+
+            $file = $service->gerarLaudo($this->serie, $this->laudo);
+
+            $this->serie->update([
+                'laudo_path' => $file['pdf']
             ]);
 
-            $this->dispatch('toast-success', message: 'Laudo realizado com sucesso!');
+            $this->dispatch('toast-success', message: 'Laudo gerado com sucesso!');
             $this->dispatch('close-modal-laudo-' . $this->serie->id);
         }catch (\Exception $e) {
             \Log::error('Erro ao laudar Série: ' . $this->serie->id . ', erro: '. $e->getMessage());
