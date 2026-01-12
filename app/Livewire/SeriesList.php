@@ -31,10 +31,14 @@ class SeriesList extends Component
                 'medico_id' => Auth::id()
             ]);
             
+            $this->serie->instance()->update([
+                'status' => 'laudado'
+            ]);
+
             $this->dispatch('toast-success', message: 'Laudo realizado com sucesso!');
             $this->dispatch('close-modal-laudo-' . $this->serie->id);
         }catch (\Exception $e) {
-            Log::error('Erro ao laudar Série: ' . $this->serie->id . ', erro: '. $e->getMessage());
+            \Log::error('Erro ao laudar Série: ' . $this->serie->id . ', erro: '. $e->getMessage());
             $this->dispatch('toast-error', message: 'Erro ao laudar Série: ' . $e->getMessage());
         }
     }
