@@ -14,7 +14,9 @@ class Serie extends Model
     protected $fillable = [
         'study_id',
         'serie_external_id',
+        'medico_id',
         'modality', #enum
+        'laudo',
         'body_part_examined'
     ];
 
@@ -25,4 +27,9 @@ class Serie extends Model
     public function instance(){
         return $this->hasMany(Instance::class, 'serie_id');
     }
+
+    public function medico(){
+        return $this->belongsTo(User::class, 'medico_id');
+    }
+
 }

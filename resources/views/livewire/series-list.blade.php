@@ -1,20 +1,16 @@
 <div x-data="{ 
     modalAnamneseOpen: false,
+    modalLaudoOpen: false,
     selectedInstanceId: null,
     anamneseTexto: '',
     isMedico: {{ Auth::user()->tipo === 'medico' ? 'true' : 'false' }},
     
-    abrirAnamnese(instanceId, anamnese) {
-        // Atualiza variáveis visuais do Alpine
-        this.selectedInstanceId = instanceId;
-        this.anamneseTexto = anamnese || '';
-        this.modalAnamneseOpen = true;
-
-        // Atualiza diretamente as propriedades do componente Livewire
-        // Isso substitui a necessidade de inputs hidden e setTimeout
-        $wire.set('instanceId', instanceId);
-        $wire.set('anamnese', anamnese || '');
+    init() {
+        Livewire.on('close-modal-laudo-{{ $serie->id }}', () => {
+            this.modalLaudoOpen = false;
+        });
     }
+
 }">
     @if(($filtro === 'todos' ? $serie->instance : $serie->instance->filter(fn($i) => $i->status === $filtro))->count() > 0)
         <div class="relative">
@@ -51,18 +47,31 @@
                                 {{ ($filtro === 'todos' ? $serie->instance : $serie->instance->filter(fn($i) => $i->status === $filtro))->count() }}
                             </span>
                         </div>
+                        <div class="col-span-2 flex items-center justify-center gap-2 mt-2">
+                            {{-- Botão Laudo --}}
+                            <button 
+                                type="button"
+                                class="px-3 py-1.5 text-xs font-medium bg-primary/5 text-primary hover:bg-primary/15 rounded-md border border-primary/10 transition-all"
+                                @click="modalLaudoOpen = true"
+                            >
+                                @if(Auth::user()->tipo == 'medico')
+                                    {{ $serie->laudo ? 'Editar Laudo' : 'Digitar Laudo'}}
+                                @else
+                                    {{ $serie->laudo ? 'Ver Laudo' : 'Sem Laudo'}}
+                                @endif
+                            </button>
 
-                        <div class="col-span-2 text-right">
+                            {{-- Botão Toggle --}}
                             <button
                                 wire:click="toggleSerie({{ $serie->id }})"
-                                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 rounded-md transition-colors"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-muted/50 text-foreground hover:bg-muted rounded-md border border-border/50 transition-colors"
                             >
                                 <svg class="w-3.5 h-3.5 transition-transform {{ ($openSeries[$serie->id] ?? false) ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
-                                {{ ($openSeries[$serie->id] ?? false) ? 'Ocultar' : 'Ver exames' }}
+                                <span>{{ ($openSeries[$serie->id] ?? false) ? 'Ocultar' : 'Ver exames' }}</span>
                             </button>
-                        </div>
+                        </div>                    
                     </div>
                 </div>
 
@@ -80,5 +89,94 @@
             </div>
         </div>
     @endif
-    
+    {{-- MODAL DE LAUDO TÉCNICO --}}
+    <template x-teleport="body">
+        <div 
+            x-show="modalLaudoOpen"
+            x-cloak
+            class="fixed inset-0 z-[9999] flex items-center justify-center"
+            style="display: none;"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+        >
+            <div @click="modalLaudoOpen = false" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+            <div 
+                class="relative bg-card border border-border rounded-lg shadow-lg w-full max-w-4xl mx-4 p-6"
+                @click.stop
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+            >
+                <div class="flex items-center justify-between mb-4 border-b border-border pb-3">
+                    <h3 class="text-xl font-semibold text-foreground flex items-center gap-2">
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span>Laudo Técnico / Médico</span>
+                    </h3>
+                    <button @click="modalLaudoOpen = false" class="p-1 hover:bg-accent rounded-lg transition-colors">
+                        <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form wire:submit.prevent="setLaudo">
+                    <div class="mb-6">
+                        <label for="laudo-{{ $serie->id }}" class="block text-sm font-medium text-foreground mb-2">
+                            Conclusão Diagnóstica <span x-show="isMedico" class="text-destructive">*</span>
+                        </label>
+                        
+                        {{-- Modo Visualização (Para quem não é médico) --}}
+                        <div x-show="!isMedico" class="w-full px-4 py-3 bg-muted/20 border border-border rounded-lg min-h-[300px] overflow-y-auto italic text-muted-foreground">
+                            {{ $serie->laudo ?? 'O laudo ainda não foi emitido pelo médico responsável.' }}
+                        </div>
+
+                        {{-- Modo Edição (Apenas para Médicos) --}}
+                        <textarea
+                            x-show="isMedico"
+                            id="laudo-{{ $serie->id }}"
+                            wire:model="laudo"
+                            placeholder="Descreva aqui o laudo detalhado..."
+                            class="w-full px-4 py-3 bg-input-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary min-h-[300px] resize-y text-foreground"
+                            rows="12"
+                        ></textarea>
+                    </div>
+
+                    <div class="flex gap-3 justify-end items-center">
+                        <span class="text-xs text-muted-foreground mr-auto" wire:loading target="setLaudo">
+                            Processando...
+                        </span>
+
+                        <button
+                            type="button"
+                            @click="modalLaudoOpen = false"
+                            class="px-4 py-2 bg-card border border-border text-foreground rounded-lg hover:bg-accent transition-colors text-sm"
+                        >
+                            Fechar
+                        </button>
+                        
+                        <button
+                            x-show="isMedico"
+                            type="submit"
+                            class="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm flex items-center gap-2"
+                        >
+                            <svg wire:loading.remove target="setLaudo" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span wire:loading.remove target="setLaudo">Salvar e Assinar Laudo</span>
+                            <span wire:loading target="setLaudo">Salvando...</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </template>
+
+
 </div>

@@ -13,7 +13,6 @@ class Instance extends Model
 
     protected $fillable = [
         'serie_id',
-        'medico_id',
         'instance_external_id',
         'file_uuid',
         'anamnese',
@@ -25,7 +24,4 @@ class Instance extends Model
         return $this->belongsTo(Serie::class, 'serie_id');
     }
 
-    public function medico(){
-        return $this->belongsTo(User::class, 'medico_id');
-    }
 }

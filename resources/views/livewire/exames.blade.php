@@ -1,20 +1,7 @@
 <div>
     <div class="p-6" x-data="{ 
-        modalRejeicaoOpen: false, 
-        selectedExameId: null, 
-        justificativa: '',
-        modalAnamneseOpen: false,
-        selectedInstanceId: null,
-        anamneseTexto: '',
         isMedico: {{ Auth::user()->tipo === 'medico' ? 'true' : 'false' }},
-        abrirAnamnese(instanceId, anamnese) {
-            this.selectedInstanceId = instanceId;
-            this.anamneseTexto = anamnese || '';
-            this.modalAnamneseOpen = true;
-            // Atualiza o Livewire quando o modal abre
-            $wire.instanceId = instanceId;
-            $wire.anamnese = anamnese || '';
-        }
+
     }">
         <div class="mb-6">
             <h2 class="text-2xl font-semibold text-foreground mb-2">Lista de Exames</h2>

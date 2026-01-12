@@ -14,10 +14,13 @@ return new class extends Migration
         Schema::create('series', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('study_id');
+            $table->unsignedBigInteger('medico_id')->nullable();
             $table->text('serie_external_id');
             $table->enum('modality', ['DX', 'CR', 'CT']);
             $table->text('body_part_examined')->nullable();
+            $table->text('laudo')->nullable();
             $table->foreign('study_id')->references('id')->on('studies')->onDelete('cascade');
+            $table->foreign('medico_id')->references('id')->on('users')->onDelete(null);
             $table->timestamps();
         });
     }

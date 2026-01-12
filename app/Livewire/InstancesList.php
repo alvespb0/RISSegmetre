@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+
 use Livewire\Component;
 use App\Models\Instance;
 use Illuminate\Support\Facades\URL;
@@ -56,7 +57,6 @@ class InstancesList extends Component
     public function downloadDCM(){
         $url = route('baixar.dicom', ['id' => $this->instance->instance_external_id]);
 
-        // O Livewire trata o redirecionamento de download automaticamente
         return redirect()->to($url);
     }
 
