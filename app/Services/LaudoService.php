@@ -37,6 +37,25 @@ class LaudoService
         $template->setValue('nomeExame', $exame);
         $template->setValue('textoLaudo', $laudo);
         $template->setValue('nomeMedicoRx', $nomeMedicoRx);
+        
+        $medico = $serie->medico;
+        if ($medico && !empty($medico->signature_path)) {
+            $assinaturaPath = storage_path('app/' . $medico->signature_path);
+            
+            if (file_exists($assinaturaPath)) {
+                $template->setImageValue('assinatura', [
+                    'path'   => $assinaturaPath,
+                    'width'  => 325,  // largura em pixels
+                    'ratio'  => true, // mantém proporção
+                ]);
+            } else {
+                // Caso o arquivo não exista, coloca placeholder
+                $template->setValue('assinatura', '');
+            }
+        } else {
+            // Médico sem assinatura
+            $template->setValue('assinatura', '');
+        }
 
         if (!empty($serie->file_path)) {
             $oldPath = storage_path('app/' . ltrim($serie->file_path, '/'));
