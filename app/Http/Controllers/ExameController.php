@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Http;
 
+use App\Models\Serie;
+
 class ExameController extends Controller
 {
     /**
@@ -38,7 +40,19 @@ class ExameController extends Controller
             \Log::error('Erro ao baixar imagem DCM: ' . $id . ', erro: '. $e->getMessage());
             abort(500);
         }
+    }
 
+    public function getLaudoFile($id){
+        $serie = Serie::findOrFail($id);
+
+        $path = $serie->laudo_path;
+
+        if(!file_exists($path)){
+            \Log::error('Erro ao baixar laudo da serie: '.$id.', path inexistente');
+            abort(500);
+        }
+
+        return response()->download($path);
     }
 }
 

@@ -16,15 +16,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
 Route::middleware(['checkUserType:admin,dev,medico,tecnico'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/exames', [ExameController::class, 'index'])->name('exames.index');
     
+    Route::get('/', [ExameController::class, 'index'])->name('exames.index');
+
     // Rotas placeholder para outras páginas
     Route::get('/pacientes', function () {
         return view('pacientes.index');
@@ -45,6 +44,8 @@ Route::middleware(['checkUserType:admin,dev,medico,tecnico'])->group(function ()
 
 Route::middleware(['checkUserType:admin,dev,tecnico,medico'])->controller(ExameController::class)->group(function (){
     Route::get('/exames/baixar-dicom/{id}', 'getDicomFile')->name('baixar.dicom');
+    Route::get('/exames/baixar-laudo/{id}', 'getLaudoFile')->name('baixar.laudo');
+
 });
 
 Route::middleware('auth')->group(function () {

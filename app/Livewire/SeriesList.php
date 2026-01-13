@@ -38,7 +38,11 @@ class SeriesList extends Component
             $file = $service->gerarLaudo($this->serie, $this->laudo);
 
             $this->serie->update([
-                'laudo_path' => $file['pdf']
+                'laudo_path' => $file['pdf'],
+            ]);
+
+            $this->serie->instance()->update([
+                'status' => 'laudado'
             ]);
 
             $this->dispatch('toast-success', message: 'Laudo gerado com sucesso!');
@@ -49,9 +53,11 @@ class SeriesList extends Component
         }
     }
     
+    public function baixarLaudo(){
+        redirect()->route('baixar.laudo', $this->serie->id);
+    }
 
-    public function toggleSerie(int $serieId)
-    {
+    public function toggleSerie(int $serieId){
         $this->openSeries[$serieId] =
             !($this->openSeries[$serieId] ?? false);
     }

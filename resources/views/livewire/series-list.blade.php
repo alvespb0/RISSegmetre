@@ -1,10 +1,6 @@
 <div x-data="{ 
-    modalAnamneseOpen: false,
     modalLaudoOpen: false,
-    selectedInstanceId: null,
-    anamneseTexto: '',
     isMedico: {{ Auth::user()->tipo === 'medico' ? 'true' : 'false' }},
-    
     init() {
         Livewire.on('close-modal-laudo-{{ $serie->id }}', () => {
             this.modalLaudoOpen = false;
@@ -60,7 +56,15 @@
                                     {{ $serie->laudo ? 'Ver Laudo' : 'Sem Laudo'}}
                                 @endif
                             </button>
-
+                            @if($filtro === 'laudado')
+                                <button 
+                                    type="button"
+                                    class="px-3 py-1.5 text-xs font-medium bg-primary/5 text-primary hover:bg-primary/15 rounded-md border border-primary/10 transition-all"
+                                    wire:click="baixarLaudo"
+                                >
+                                    Download Laudo
+                                </button>
+                            @endif
                             {{-- Botão Toggle --}}
                             <button
                                 wire:click="toggleSerie({{ $serie->id }})"
