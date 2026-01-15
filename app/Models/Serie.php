@@ -19,6 +19,7 @@ class Serie extends Model
         'laudo',
         'laudo_path',
         'laudo_assinado',
+        'motivo_rejeicao',
         'body_part_examined'
     ];
 

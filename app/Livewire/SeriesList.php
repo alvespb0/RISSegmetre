@@ -20,6 +20,7 @@ class SeriesList extends Component
     public $instanceId;
     public $liberarTecnico = [];
     public $laudo = '';
+    public $rejeicao = '';
 
     public function mount(Serie $serie, $filtro){
         $this->serie = $serie;
@@ -53,6 +54,25 @@ class SeriesList extends Component
         }
     }
     
+    public function setRejeicao(){
+        try{
+            $this->serie->update([
+                'medico_id' => Auth::id(),
+                'motivo_rejeicao' => $this->rejeicao
+            ]);
+            
+            $this->serie->instance()->update([
+                'status' => 'rejeitado'
+            ]);
+
+            $this->dispatch('toast-success', message: 'Exame rejeitado!');
+            $this->dispatch('close-modal-rejeicao-' . $this->serie->id);
+        }catch (\Exception $e) {
+            \Log::error('Erro ao rejeitar série: ' . $this->serie->id . ', erro: '. $e->getMessage());
+            $this->dispatch('toast-error', message: 'Erro ao rejeitar exame: ' . $e->getMessage());
+        }
+    }
+
     public function baixarLaudo(){
         redirect()->route('baixar.laudo', $this->serie->id);
     }

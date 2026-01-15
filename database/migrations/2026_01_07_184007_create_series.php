@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('body_part_examined')->nullable();
             $table->text('laudo')->nullable();
             $table->text('laudo_path')->nullable();
+            $table->text('motivo_rejeicao')->nullable();
             $table->boolean('laudo_assinado')->default(false);
             $table->foreign('study_id')->references('id')->on('studies')->onDelete('cascade');
             $table->foreign('medico_id')->references('id')->on('users')->onDelete(null);
