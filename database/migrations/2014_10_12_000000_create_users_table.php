@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('signature_path')->nullable();
-            $table->enum('tipo', ['admin', 'medico', 'tecnico', 'paciente', 'dev']);
+            $table->enum('tipo', ['admin', 'medico', 'tecnico', 'dev']);
             $table->rememberToken();
             $table->timestamps();
         });

@@ -35,4 +35,7 @@ class Serie extends Model
         return $this->belongsTo(User::class, 'medico_id');
     }
 
+    public function protocolo(){
+        return $this->hasOne(DeliveryProtocol::class, 'laudo_id');
+    }
 }
