@@ -62,7 +62,7 @@
                                         @endif
                                     </button>
                                 @endif
-                                @if($serie->instance->contains('status', 'rejeitado') || $filtro == 'todos' || Auth::user()->tipo == 'medico')
+                                @if((($serie->instance->contains('status', 'rejeitado') || $filtro == 'todos') && Auth::user()->tipo == 'medico') || $filtro == 'rejeitado')
                                     <button 
                                         type="button"
                                         class="px-3 py-1.5 text-xs font-medium bg-primary/5 text-primary hover:bg-primary/15 rounded-md border border-primary/10 transition-all"
@@ -75,14 +75,72 @@
                                         @endif
                                     </button>
                                 @endif
+                                @if(($serie->instance->contains('status', 'laudado') && $serie->protocolo()->exists()) && Auth::user()->tipo != 'medico')
+                                    <button
+                                        type="button"
+                                        wire:click="baixarProtocolo"
+                                        wire:loading.attr="disabled"
+                                        wire:target="baixarProtocolo"
+                                        class="flex items-center gap-1 whitespace-nowrap px-2.5 py-1 text-[11px] font-medium rounded-md border transition-all
+                                            bg-primary/5 text-primary hover:bg-primary/15 border-primary/10
+                                            disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <span wire:loading.remove wire:target="baixarProtocolo">
+                                            Download Protocolo
+                                        </span>
+
+                                        <span wire:loading wire:target="baixarProtocolo" class="flex items-center gap-1">
+                                            <svg class="animate-spin h-3 w-3 text-primary" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                                <path class="opacity-75" fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z"/>
+                                            </svg>
+                                            Baixando...
+                                        </span>
+                                    </button>
+                                @elseif(($serie->instance->contains('status', 'laudado') && !$serie->protocolo()->exists()) && Auth::user()->tipo != 'medico')
+                                    <button
+                                        type="button"
+                                        wire:click="gerarProtocolo"
+                                        wire:loading.attr="disabled"
+                                        wire:target="gerarProtocolo"
+                                        class="whitespace-nowrap px-2.5 py-1 text-[11px] font-medium rounded-md border transition-all
+                                            bg-primary/5 text-primary hover:bg-primary/15 border-primary/10
+                                            disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <span wire:loading.remove wire:target="gerarProtocolo">
+                                            Gerar Protocolo
+                                        </span>
+
+                                        <span wire:loading wire:target="gerarProtocolo">
+                                            Gerando...
+                                        </span>
+                                    </button>
+
+                                @endif
                                 {{-- Botão Download --}}
                                 @if($serie->instance->contains('status', 'laudado'))
-                                    <button 
+                                    <button
                                         type="button"
-                                        class="whitespace-nowrap px-2.5 py-1 text-[11px] font-medium bg-primary/5 text-primary hover:bg-primary/15 rounded-md border border-primary/10 transition-all"
                                         wire:click="baixarLaudo"
+                                        wire:loading.attr="disabled"
+                                        wire:target="baixarLaudo"
+                                        class="flex items-center gap-1 whitespace-nowrap px-2.5 py-1 text-[11px] font-medium rounded-md border transition-all
+                                            bg-primary/5 text-primary hover:bg-primary/15 border-primary/10
+                                            disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        Download Laudo
+                                        <span wire:loading.remove wire:target="baixarLaudo">
+                                            Download Laudo
+                                        </span>
+
+                                        <span wire:loading wire:target="baixarLaudo" class="flex items-center gap-1">
+                                            <svg class="animate-spin h-3 w-3 text-primary" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                                <path class="opacity-75" fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z"/>
+                                            </svg>
+                                            Baixando...
+                                        </span>
                                     </button>
                                 @endif
 

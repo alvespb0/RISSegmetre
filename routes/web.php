@@ -19,32 +19,26 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['checkUserType:admin,dev,medico,tecnico'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    Route::get('/exames', [ExameController::class, 'index'])->name('exames.index');
-    
     Route::get('/', [ExameController::class, 'index'])->name('exames.index');
-
-    // Rotas placeholder para outras páginas
     Route::get('/pacientes', function () {
         return view('pacientes.index');
     })->name('pacientes.index');
-    
     Route::get('/relatorios', function () {
         return view('relatorios.index');
     })->name('relatorios.index');
-    
     Route::get('/usuarios', function () {
         return view('usuarios.index');
     })->name('usuarios.index');
-    
     Route::get('/configuracoes', function () {
         return view('configuracoes.index');
     })->name('configuracoes.index');
 });
 
 Route::middleware(['checkUserType:admin,dev,tecnico,medico'])->controller(ExameController::class)->group(function (){
+    Route::get('/exames', 'index')->name('exames.index');
     Route::get('/exames/baixar-dicom/{id}', 'getDicomFile')->name('baixar.dicom');
     Route::get('/exames/baixar-laudo/{id}', 'getLaudoFile')->name('baixar.laudo');
+    Route::get('/exames/baixar-protocolo/{id}', 'getProtocoloFile')->name('baixar.protocolo');
 
 });
 

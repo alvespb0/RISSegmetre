@@ -9,6 +9,7 @@ use App\Models\Serie;
 use App\Models\Instance;
 
 use App\Services\LaudoService;
+use App\Services\ProtocoloService;
 
 class SeriesList extends Component
 {
@@ -54,6 +55,18 @@ class SeriesList extends Component
         }
     }
     
+    public function gerarProtocolo(){
+        try{
+            $service = new ProtocoloService();
+
+            $service->gerarProtocolo($this->serie);
+            $this->dispatch('toast-success', message: 'Protocolo de entrega gerado com sucesso!');
+        }catch (\Exception $e) {
+            \Log::error('Erro ao gerar protocolo de entrega da série: ' . $this->serie->id . ', erro: '. $e->getMessage());
+            $this->dispatch('toast-error', message: 'Erro ao gerar protocolo de entrega da Série: ' . $e->getMessage());
+        }
+    }
+
     public function setRejeicao(){
         try{
             $this->serie->update([
@@ -75,6 +88,10 @@ class SeriesList extends Component
 
     public function baixarLaudo(){
         redirect()->route('baixar.laudo', $this->serie->id);
+    }
+
+    public function baixarProtocolo(){
+        redirect()->route('baixar.protocolo', $this->serie->id);
     }
 
     public function toggleSerie(int $serieId){

@@ -54,5 +54,18 @@ class ExameController extends Controller
 
         return response()->download($path);
     }
+
+    public function getProtocoloFile($id){
+        $serie = Serie::findOrFail($id);
+
+        $path = $serie->protocolo->protocolo_path;
+
+        if(!file_exists($path)){
+            \Log::error('Erro ao baixar Protocolo de entrega da serie: '.$id.', path inexistente');
+            abort(500);
+        }
+
+        return response()->download($path);
+    }
 }
 
