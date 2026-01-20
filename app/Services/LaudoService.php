@@ -69,20 +69,8 @@ class LaudoService
             $template->setValue('assinatura', '');
         }
 
-        if (!empty($serie->file_path)) {
-            $oldPath = storage_path('app/' . ltrim($serie->file_path, '/'));
-
-            $laudosDir = realpath(storage_path('app/laudos'));
-            $oldReal   = realpath($oldPath);
-
-            if ($oldReal && str_starts_with($oldReal, $laudosDir) && file_exists($oldReal)) {
-                @unlink($oldReal);
-            } else {
-                Log::warning('Tentativa de remoção de laudo fora do diretório esperado', [
-                    'serie_id' => $serie->id,
-                    'path' => $serie->file_path,
-                ]);
-            }
+        if (!empty($serie->laudo_path)) {
+            Storage::delete($serie->laudo_path);
         }
 
         $uuid = Str::uuid()->toString();

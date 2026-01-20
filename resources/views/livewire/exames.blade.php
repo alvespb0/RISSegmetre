@@ -50,9 +50,9 @@
                                 <td class="px-6 py-4">
                                     <span class="font-semibold text-foreground">{{ $study->patient->nome }}</span>
                                 </td>
-                                <td class="px-6 py-4 text-foreground">{{ $study->patient->sexo ?? N/A }}</td>
-                                <td class="px-6 py-4 text-foreground">{{ $study->study_date ?? N/A }}</td>
-                                <td class="px-6 py-4 text-foreground">{{ $study->solicitante ?? N/A }}</td>
+                                <td class="px-6 py-4 text-foreground">{{ $study->patient->sexo ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 text-foreground">{{ $study->study_date ?? 'N/A' }}</td>
+                                <td class="px-6 py-4 text-foreground">{{ $study->solicitante ?? 'N/A' }}</td>
                                 <td class="px-6 py-4">
                                     <button
                                         wire:click="toggleStudy({{ $study->id }})"

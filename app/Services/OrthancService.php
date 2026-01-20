@@ -104,7 +104,7 @@ class OrthancService
             ]);
 
             if(!$response->ok()){
-                \Log::error('Não localizado serie para endpoint informado.', ['endpoint' => $endpoint]);
+                \Log::error('Não localizado serie para endpoint informado.', ['endpoint' => $endPoint]);
                 return false;
             }
            
