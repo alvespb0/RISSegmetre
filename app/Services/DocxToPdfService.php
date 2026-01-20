@@ -5,6 +5,18 @@ use Exception;
 
 class DocxToPdfService
 {   
+    /**
+     * Converte um arquivo DOCX em PDF usando o LibreOffice em modo headless.
+     *
+     * Observação: depende da variável de ambiente `LIBREOFFICE_BIN` apontando para o binário
+     * do LibreOffice (especialmente importante no Windows).
+     *
+     * @param string $docxPath Caminho absoluto/relativo do arquivo .docx de entrada.
+     * @return string Caminho do PDF gerado (mesma pasta do DOCX, com extensão .pdf).
+     *
+     * @throws \Exception Quando o DOCX não existe, o LibreOffice não é encontrado, a conversão falha
+     *                   ou o PDF não é gerado.
+     */
     public function convert(string $docxPath): string
     {
         if (!file_exists($docxPath)) {

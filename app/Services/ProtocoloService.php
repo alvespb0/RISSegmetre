@@ -14,6 +14,16 @@ use Illuminate\Support\Facades\Hash;
 
 class ProtocoloService
 {
+    /**
+     * Gera um protocolo de entrega para a Série (com QR Code), cria o PDF via template
+     * e persiste o registro em `DeliveryProtocol`.
+     *
+     * @param \App\Models\Serie $serie Série vinculada ao protocolo de entrega.
+     *
+     * @return array{pdf:string} Array com o caminho do PDF gerado.
+     *
+     * @throws \Exception Quando o template não é encontrado ou quando há falha na conversão/geração do PDF.
+     */
     public function gerarProtocolo(Serie $serie)
     {
         // 1. Lógica do Protocolo
@@ -115,7 +125,10 @@ class ProtocoloService
     }
 
     /**
-     * Função auxiliar para apagar pasta temporária
+     * Remove recursivamente um diretório temporário e seus arquivos.
+     *
+     * @param mixed $dir Caminho do diretório a ser removido.
+     * @return void
      */
     private function cleanup($dir)
     {

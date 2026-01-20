@@ -12,14 +12,15 @@ use Carbon\Carbon;
 
 /**
  * Serviço responsável pela integração com o servidor DICOM Orthanc.
- * * Realiza o consumo da API REST do Orthanc para sincronizar Pacientes, 
+ * Realiza o consumo da API REST do Orthanc para sincronizar Pacientes,
  * Estudos, Séries e Instâncias com o banco de dados local.
  */
 class OrthancService
 {
     /**
      * Obtém todos os estudos do Orthanc e sincroniza recursivamente com o banco local.
-     * * @return bool Retorna true em caso de sucesso ou false/null em caso de falha.
+     *
+     * @return bool Retorna true em caso de sucesso; false em caso de falha tratada.
      */
     public function getStudies(){
         $endPoint = env('ORTHANC_SERVER').'/studies';
@@ -89,9 +90,10 @@ class OrthancService
 
     /**
      * Obtém e salva os dados de uma Série específica.
+     *
      * @param int $studyId ID interno do estudo no banco de dados.
      * @param string $serieId ID externo (UUID) da série no Orthanc.
-     * @return bool
+     * @return bool Retorna true em caso de sucesso; false em caso de falha tratada.
      */
     public function getSeries($studyId, $serieId){
         $endPoint = env('ORTHANC_SERVER').'/series'.'/'.$serieId;
@@ -127,9 +129,10 @@ class OrthancService
 
     /**
      * Obtém e salva os dados de uma Instância (imagem/arquivo) específica.
-     * * @param int $serieId ID interno da série no banco de dados.
+     *
+     * @param int $serieId ID interno da série no banco de dados.
      * @param string $instanceId ID externo (UUID) da instância no Orthanc.
-     * @return bool
+     * @return bool Retorna true em caso de sucesso; false em caso de falha tratada.
      */
     public function getInstance($serieId, $instanceId){
         $endPoint = env('ORTHANC_SERVER').'/instances'.'/'.$instanceId;

@@ -23,11 +23,25 @@ class SeriesList extends Component
     public $laudo = '';
     public $rejeicao = '';
 
+    /**
+     * Inicializa o componente com a Série selecionada e o filtro de status atual.
+     *
+     * @param \App\Models\Serie $serie Série carregada via route-model binding.
+     * @param mixed $filtro Filtro de status (ex.: 'pendente', 'laudado', 'rejeitado', 'todos').
+     * @return void
+     */
     public function mount(Serie $serie, $filtro){
         $this->serie = $serie;
         $this->filtro = $filtro;
     }
 
+    /**
+     * Persiste o laudo da série, gera o PDF e atualiza o status das instâncias relacionadas.
+     *
+     * Dispara eventos de toast e fechamento de modal.
+     *
+     * @return void
+     */
     public function setLaudo(){
         try{
             $this->serie->update([
@@ -55,6 +69,13 @@ class SeriesList extends Component
         }
     }
     
+    /**
+     * Gera o protocolo de entrega da série.
+     *
+     * Dispara eventos de toast em caso de sucesso/erro.
+     *
+     * @return void
+     */
     public function gerarProtocolo(){
         try{
             $service = new ProtocoloService();
@@ -67,6 +88,13 @@ class SeriesList extends Component
         }
     }
 
+    /**
+     * Registra o motivo de rejeição e atualiza o status das instâncias relacionadas para "rejeitado".
+     *
+     * Dispara eventos de toast e fechamento de modal.
+     *
+     * @return void
+     */
     public function setRejeicao(){
         try{
             $this->serie->update([
@@ -86,19 +114,40 @@ class SeriesList extends Component
         }
     }
 
+    /**
+     * Redireciona para a rota de download do laudo da série.
+     *
+     * @return void
+     */
     public function baixarLaudo(){
         redirect()->route('baixar.laudo', $this->serie->id);
     }
 
+    /**
+     * Redireciona para a rota de download do protocolo de entrega da série.
+     *
+     * @return void
+     */
     public function baixarProtocolo(){
         redirect()->route('baixar.protocolo', $this->serie->id);
     }
 
+    /**
+     * Alterna (abre/fecha) o estado de expansão de uma Série na lista.
+     *
+     * @param int $serieId ID da Série.
+     * @return void
+     */
     public function toggleSerie(int $serieId){
         $this->openSeries[$serieId] =
             !($this->openSeries[$serieId] ?? false);
     }
 
+    /**
+     * Renderiza a view do componente.
+     *
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function render()
     {
         return view('livewire.series-list');

@@ -10,12 +10,24 @@ use Illuminate\Support\Str;
 use App\Models\Serie;
 
 /**
- * Serviço responsável pela integração com o servidor DICOM Orthanc.
- * * Realiza o consumo da API REST do Orthanc para sincronizar Pacientes, 
- * Estudos, Séries e Instâncias com o banco de dados local.
+ * Serviço responsável por gerar e armazenar o laudo (DOCX/PDF) de uma Série.
+ *
+ * Fluxo geral:
+ * - Carrega um template DOCX e preenche os placeholders com dados da Série/Paciente;
+ * - Opcionalmente insere a imagem de assinatura do médico;
+ * - Converte o DOCX para PDF via `DocxToPdfService`;
+ * - Move o PDF para o diretório final e retorna o caminho gerado.
  */
 class LaudoService
 {
+    /**
+     * Gera o laudo da Série a partir de template, converte para PDF e retorna o caminho final.
+     *
+     * @param \App\Models\Serie $serie Série para a qual o laudo será gerado.
+     * @param mixed $laudo Texto do laudo (conteúdo a ser inserido no template).
+     *
+     * @return array{pdf:string} Array com o caminho do PDF gerado.
+     */
     public function gerarLaudo(Serie $serie, $laudo){
         $templatePath = storage_path('app/modelos/Modelo-Laudo-RX.docx');
 

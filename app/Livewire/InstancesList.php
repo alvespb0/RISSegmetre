@@ -16,6 +16,13 @@ class InstancesList extends Component
     public $anamnese = ''; 
     public $liberadoTec = false;
 
+    /**
+     * Inicializa o componente com a instância selecionada e o filtro atual.
+     *
+     * @param \App\Models\Instance $instance Instância carregada via route-model binding.
+     * @param mixed $filtro Filtro de status (ex.: 'pendente', 'laudado', 'rejeitado', 'todos').
+     * @return void
+     */
     public function mount(Instance $instance, $filtro)
     {
         $this->instance = $instance;
@@ -24,6 +31,13 @@ class InstancesList extends Component
         $this->liberadoTec = $instance->liberado_tec;
     }
 
+    /**
+     * Persiste a anamnese da instância.
+     *
+     * Dispara eventos de toast e fechamento de modal.
+     *
+     * @return void
+     */
     public function setAnamnese()
     {
         try {
@@ -39,6 +53,13 @@ class InstancesList extends Component
         }
     }
     
+    /**
+     * Libera a instância para o técnico (marca liberado_tec = true).
+     *
+     * Dispara eventos de toast em caso de sucesso/erro.
+     *
+     * @return void
+     */
     public function liberarExame()
     {
         try {
@@ -54,12 +75,22 @@ class InstancesList extends Component
         }
     }
 
+    /**
+     * Redireciona para a rota de download do DICOM (DCM) da instância.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function downloadDCM(){
         $url = route('baixar.dicom', ['id' => $this->instance->instance_external_id]);
 
         return redirect()->to($url);
     }
 
+    /**
+     * Renderiza a view do componente.
+     *
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function render()
     {
         return view('livewire.instances-list');

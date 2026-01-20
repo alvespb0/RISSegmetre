@@ -15,17 +15,34 @@ class Exames extends Component
     public array $openStudies = [];
 
     
+    /**
+     * Define o filtro de status usado para listar exames/instâncias e reseta a paginação.
+     *
+     * @param mixed $filtro Valor do filtro (ex.: 'pendente', 'laudado', 'rejeitado', 'todos').
+     * @return void
+     */
     public function setFiltro($filtro){
         $this->filtro = $filtro;
         $this->resetPage();
     }
 
+    /**
+     * Alterna (abre/fecha) o estado de expansão de um Study na lista.
+     *
+     * @param int $studyId ID do Study.
+     * @return void
+     */
     public function toggleStudy(int $studyId)
     {
         $this->openStudies[$studyId] =
             !($this->openStudies[$studyId] ?? false);
     }
 
+    /**
+     * Monta os dados para a view do componente, aplicando filtro e paginação.
+     *
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function render()
     {
         $studies = Study::with(['patient', 'serie.instance'])
