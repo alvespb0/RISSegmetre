@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 
 class InstancesList extends Component
 {
-    public Instance $instance; 
+    public $instance; 
     public $filtro;
     public $anamnese = ''; 
     public $liberadoTec = false;

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ExameController;
+use App\Http\Controllers\PatientController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,7 +40,10 @@ Route::middleware(['checkUserType:admin,dev,tecnico,medico'])->controller(ExameC
     Route::get('/exames/baixar-dicom/{id}', 'getDicomFile')->name('baixar.dicom');
     Route::get('/exames/baixar-laudo/{id}', 'getLaudoFile')->name('baixar.laudo');
     Route::get('/exames/baixar-protocolo/{id}', 'getProtocoloFile')->name('baixar.protocolo');
+});
 
+Route::middleware(['checkPatientProtocol'])->controller(PatientController::class)->group(function (){
+    Route::get('/exames/delivery-protocol', 'exames')->name('patient.exames');
 });
 
 Route::middleware('auth')->group(function () {

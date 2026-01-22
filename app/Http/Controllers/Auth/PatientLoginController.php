@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\PatientLoginRequest;
+use App\Models\DeliveryProtocol;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+
+class PatientLoginController extends Controller
+{
+    /**
+     * Handle an incoming patient login request.
+     *
+     * @param  \App\Http\Requests\Auth\PatientLoginRequest  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function store(PatientLoginRequest $request): RedirectResponse
+    {
+        $protocol = DeliveryProtocol::where('protocolo', $request->protocolo)->first();
+
+        if (!$protocol || !Hash::check($request->senha, $protocol->senha)) {
+            \Log::warning('Tentativa de login de paciente falhou', [
+                'protocolo' => $request->protocolo,
+                'ip' => $request->ip(),
+            ]);
+
+            throw ValidationException::withMessages([
+                'protocolo' => 'Protocolo ou senha inválidos.',
+            ]);
+        }
+
+        $now = now();
+        $protocol->update([
+            'visualizado' => true,
+            'first_view_at' => $protocol->first_view_at ?? $now,
+            'last_view_at' => $now,
+        ]);
+
+        \Log::info('Login de paciente realizado com sucesso', [
+            'protocolo_id' => $protocol->id,
+            'serie_id' => $protocol->laudo_id,
+            'ip' => $request->ip(),
+        ]);
+
+        session()->put('patient_protocol', $protocol->protocolo);
+        
+        return redirect()->route('patient.exames')
+            ->with('mensagem', 'Acesso liberado! Bem-vindo.');
+    }
+}

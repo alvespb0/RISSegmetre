@@ -26,20 +26,10 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
+            'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
         ];
-
-        // Se for paciente, valida protocolo, senão valida email
-        $isPaciente = $this->input('is_paciente') === '1' || $this->boolean('is_paciente');
-        
-        if ($isPaciente) {
-            $rules['protocolo'] = ['required', 'string'];
-        } else {
-            $rules['email'] = ['required', 'string', 'email'];
-        }
-
-        return $rules;
     }
 
     /**
@@ -51,33 +41,12 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $isPaciente = $this->input('is_paciente') === '1' || $this->boolean('is_paciente');
-        
-        if ($isPaciente) {
-            // Buscar por protocolo (que pode ser o email ou um campo específico)
-            // Assumindo que protocolo pode ser usado como identificador único
-            $user = \App\Models\User::where('tipo', 'paciente')
-                ->where(function($query) {
-                    $query->where('email', $this->string('protocolo'))
-                          ->orWhere('id', $this->string('protocolo'));
-                })
-                ->first();
+        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+            RateLimiter::hit($this->throttleKey());
 
-            if (!$user || !\Illuminate\Support\Facades\Hash::check($this->string('password'), $user->password)) {
-                RateLimiter::hit($this->throttleKey());
-                throw ValidationException::withMessages([
-                    'protocolo' => trans('auth.failed'),
-                ]);
-            }
-
-            Auth::login($user, $this->boolean('remember'));
-        } else {
-            if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-                RateLimiter::hit($this->throttleKey());
-                throw ValidationException::withMessages([
-                    'email' => trans('auth.failed'),
-                ]);
-            }
+            throw ValidationException::withMessages([
+                'email' => trans('auth.failed'),
+            ]);
         }
 
         RateLimiter::clear($this->throttleKey());
@@ -111,11 +80,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        $isPaciente = $this->input('is_paciente') === '1' || $this->boolean('is_paciente');
-        $identifier = $isPaciente 
-            ? $this->string('protocolo') 
-            : $this->string('email');
-        
-        return Str::transliterate(Str::lower($identifier).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
     }
 }
