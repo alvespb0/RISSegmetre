@@ -2,7 +2,7 @@
     <div class="bg-card border border-border rounded-xl shadow-sm overflow-hidden" x-data="{ showImages: false }">
         
         <div class="p-6 md:p-8 border-b border-border/60">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 gap-8">
                 <div class="flex items-start gap-4">
                     <div class="p-3 bg-primary/10 rounded-xl text-primary shrink-0">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -34,12 +34,12 @@
                 Arquivos Disponíveis
             </h3>
 
-            <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex flex-col gap-4">
                 <button type="button" wire:click="downloadLaudo" class="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all shadow-sm hover:shadow-md active:scale-[0.99] font-semibold text-base">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     Baixar Laudo PDF
                 </button>
-
+                    
                 <button 
                     type="button" 
                     @click="showImages = !showImages"

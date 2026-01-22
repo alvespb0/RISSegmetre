@@ -50,4 +50,17 @@ class PatientLoginController extends Controller
         return redirect()->route('patient.exames')
             ->with('mensagem', 'Acesso liberado! Bem-vindo.');
     }
+
+    public function logout(): RedirectResponse
+    {
+        session()->forget('patient_protocol');
+
+        \Log::info('Logout de paciente realizado', [
+            'ip' => request()->ip(),
+        ]);
+
+        return redirect()->route('login')
+            ->with('mensagem', 'Você saiu com sucesso.');
+    }
+
 }

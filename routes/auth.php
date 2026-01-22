@@ -39,6 +39,8 @@ Route::middleware('guest')->group(function () {
                 ->name('password.store');
 });
 
+Route::middleware('checkPatientProtocol')->get('/exames/delivery-protocol/logout', [\App\Http\Controllers\Auth\PatientLoginController::class, 'logout']);
+
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
                 ->name('verification.notice');
