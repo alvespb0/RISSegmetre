@@ -44,6 +44,8 @@ Route::middleware(['checkUserType:admin,dev,tecnico,medico'])->controller(ExameC
 
 Route::middleware(['checkPatientProtocol'])->controller(PatientController::class)->group(function (){
     Route::get('/exames/delivery-protocol', 'exames')->name('patient.exames');
+    Route::get('/exames/delivery-protocol/download-laudo/{protocoloEnc}', 'downloadLaudo')->name('patient.download.laudo');
+    Route::get('/exames/delivery-protocol/download-imagem/{idEnc}', 'downloadImagemJpg')->name('patient.download.imagem');
 });
 
 Route::middleware('auth')->group(function () {
