@@ -6,6 +6,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Instance;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Crypt;
 
 use Illuminate\Support\Facades\Log;
 
@@ -81,9 +82,9 @@ class InstancesList extends Component
      * @return \Illuminate\Http\RedirectResponse
      */
     public function downloadDCM(){
-        $url = route('baixar.dicom', ['id' => $this->instance->instance_external_id]);
+        $idEnc = Crypt::encryptString($this->instance->instance_external_id);
 
-        return redirect()->to($url);
+        return redirect()->route('baixar.dicom', $idEnc);
     }
 
     /**

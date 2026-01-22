@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 
 use Livewire\Component;
 use App\Models\Serie;
@@ -120,7 +121,8 @@ class SeriesList extends Component
      * @return void
      */
     public function baixarLaudo(){
-        redirect()->route('baixar.laudo', $this->serie->id);
+        $idEnc = Crypt::encryptString($this->serie->id);
+        redirect()->route('baixar.laudo', $idEnc);
     }
 
     /**
@@ -129,7 +131,8 @@ class SeriesList extends Component
      * @return void
      */
     public function baixarProtocolo(){
-        redirect()->route('baixar.protocolo', $this->serie->id);
+        $idEnc = Crypt::encryptString($this->serie->id);
+        redirect()->route('baixar.protocolo', $idEnc);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Crypt;
 
 use App\Models\Serie;
 
@@ -18,7 +19,9 @@ class ExameController extends Controller
         return view('exames.index');
     }
 
-    public function getDicomFile($id){
+    public function getDicomFile($idEnc){
+        $id = Crypt::decryptString($idEnc);
+
         $endPoint = env('ORTHANC_SERVER').'/instances'.'/'.$id.'/file';
 
         try{
@@ -42,7 +45,9 @@ class ExameController extends Controller
         }
     }
 
-    public function getLaudoFile($id){
+    public function getLaudoFile($idEnc){
+        $id = Crypt::decryptString($idEnc);
+
         $serie = Serie::findOrFail($id);
 
         $path = $serie->laudo_path;
@@ -55,7 +60,9 @@ class ExameController extends Controller
         return response()->download($path);
     }
 
-    public function getProtocoloFile($id){
+    public function getProtocoloFile($idEnc){
+        $id = Crypt::decryptString($idEnc);
+
         $serie = Serie::findOrFail($id);
 
         $path = $serie->protocolo->protocolo_path;

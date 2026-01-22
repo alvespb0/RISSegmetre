@@ -37,9 +37,9 @@ Route::middleware(['checkUserType:admin,dev,medico,tecnico'])->group(function ()
 
 Route::middleware(['checkUserType:admin,dev,tecnico,medico'])->controller(ExameController::class)->group(function (){
     Route::get('/exames', 'index')->name('exames.index');
-    Route::get('/exames/baixar-dicom/{id}', 'getDicomFile')->name('baixar.dicom');
-    Route::get('/exames/baixar-laudo/{id}', 'getLaudoFile')->name('baixar.laudo');
-    Route::get('/exames/baixar-protocolo/{id}', 'getProtocoloFile')->name('baixar.protocolo');
+    Route::get('/exames/baixar-dicom/{idEnc}', 'getDicomFile')->name('baixar.dicom');
+    Route::get('/exames/baixar-laudo/{idEnc}', 'getLaudoFile')->name('baixar.laudo');
+    Route::get('/exames/baixar-protocolo/{idEnc}', 'getProtocoloFile')->name('baixar.protocolo');
 });
 
 Route::middleware(['checkPatientProtocol'])->controller(PatientController::class)->group(function (){
