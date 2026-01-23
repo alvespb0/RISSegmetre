@@ -62,7 +62,7 @@
                                         @endif
                                     </button>
                                 @endif
-                                @if((($serie->instance->contains('status', 'rejeitado') || $filtro == 'todos') && Auth::user()->tipo == 'medico') || $filtro == 'rejeitado')
+                                @if($serie->instance->contains('status', 'rejeitado') || ($serie->instance->contains('status', 'pendente') && Auth::user()->tipo == 'medico'))
                                     <button 
                                         type="button"
                                         class="px-3 py-1.5 text-xs font-medium bg-primary/5 text-primary hover:bg-primary/15 rounded-md border border-primary/10 transition-all"

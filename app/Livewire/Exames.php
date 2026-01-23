@@ -38,6 +38,18 @@ class Exames extends Component
             !($this->openStudies[$studyId] ?? false);
     }
 
+    public function getExames(){
+        $service = new \App\Services\OrthancService;
+
+        $retorno = $service->getStudies();
+
+        if(!$retorno){
+            \Log::error('Erro ao resgatar novos exames');
+            $this->dispatch('toast-error', message: 'Erro ao capturar novos exames');
+        }
+
+        $this->dispatch('toast-success', message: 'Exames atualizados!');
+    }
     /**
      * Monta os dados para a view do componente, aplicando filtro e paginação.
      *

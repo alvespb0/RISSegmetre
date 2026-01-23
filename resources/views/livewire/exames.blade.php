@@ -8,27 +8,40 @@
             <p class="text-muted-foreground">Gerencie e visualize todos os exames radiológicos</p>
         </div>
 
-        <!-- Filtros rápidos -->
-        <div class="flex gap-3 mb-6 flex-wrap">
-            @foreach ([
-                'todos'     => 'Todos os Exames',
-                'pendente' => 'Pendentes',
-                'rejeitado'  => 'Rejeitados',
-                'laudado' => 'Laudados',
-            ] as $key => $label)
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+            <!-- Filtros rápidos -->
+            <div class="flex gap-3 mb-6 flex-wrap">
+                @foreach ([
+                    'todos'     => 'Todos os Exames',
+                    'pendente' => 'Pendentes',
+                    'rejeitado'  => 'Rejeitados',
+                    'laudado' => 'Laudados',
+                ] as $key => $label)
+                    <button
+                        wire:click="setFiltro('{{ $key }}')"
+                        class="
+                            px-4 py-2 rounded-lg transition-colors
+                            {{ $filtro === $key
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-card text-foreground border border-border hover:bg-accent'
+                            }}
+                        "
+                    >
+                        {{ $label }}
+                    </button>
+                @endforeach
+            </div>
+            <div class="flex gap-3 mb-6 flex-wrap">
                 <button
-                    wire:click="setFiltro('{{ $key }}')"
-                    class="
-                        px-4 py-2 rounded-lg transition-colors
-                        {{ $filtro === $key
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-card text-foreground border border-border hover:bg-accent'
-                        }}
-                    "
+                    wire:click="getExames" 
+                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-card text-foreground border border-border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors shadow-sm"
                 >
-                    {{ $label }}
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Atualizar exames
                 </button>
-            @endforeach
+            </div>
         </div>
 
         <!-- Tabela de dados -->
@@ -158,22 +171,4 @@
 <style>
         [x-cloak] { display: none !important; }
     </style>
-
-    <script>
-        function visualizarExame(id) {
-            console.log('Visualizar exame no Weasis:', id);
-            alert(`Abrindo exame ${id} no Weasis Viewer...`);
-        }
-
-        function escreverLaudo(id) {
-            console.log('Escrever laudo para exame:', id);
-            alert(`Abrindo editor de laudo para exame ${id}...`);
-        }
-
-        function confirmarRejeicao(id, justificativa) {
-            console.log('Rejeitar exame:', id, 'Justificativa:', justificativa);
-            alert(`Exame ${id} rejeitado.\nJustificativa: ${justificativa}`);
-            // Aqui você pode fazer uma requisição AJAX para salvar no backend
-        }
-    </script>
 </div>
