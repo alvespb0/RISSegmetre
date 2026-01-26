@@ -8,11 +8,10 @@
             <p class="text-muted-foreground">Gerencie e visualize todos os exames radiológicos</p>
         </div>
 
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-            <!-- Filtros rápidos -->
-            <div class="flex gap-3 mb-6 flex-wrap">
+        <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 mb-6">            
+            <div class="flex gap-3 flex-wrap">
                 @foreach ([
-                    'todos'     => 'Todos os Exames',
+                    'todos'     => 'Todos',
                     'pendente' => 'Pendentes',
                     'rejeitado'  => 'Rejeitados',
                     'laudado' => 'Laudados',
@@ -20,10 +19,10 @@
                     <button
                         wire:click="setFiltro('{{ $key }}')"
                         class="
-                            px-4 py-2 rounded-lg transition-colors
+                            px-4 py-2 text-sm font-medium rounded-lg transition-colors border
                             {{ $filtro === $key
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-card text-foreground border border-border hover:bg-accent'
+                                ? 'bg-primary text-primary-foreground border-primary'
+                                : 'bg-card text-foreground border-border hover:bg-accent'
                             }}
                         "
                     >
@@ -31,20 +30,44 @@
                     </button>
                 @endforeach
             </div>
-            <div class="flex gap-3 mb-6 flex-wrap">
+
+            <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+                
+                <div class="relative w-full sm:w-64">
+                    <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input 
+                        type="text" 
+                        wire:model.live.debounce.500ms="filtroPaciente"
+                        class="w-full pl-9 pr-3 py-2 text-sm bg-card border border-border text-foreground rounded-lg focus:ring-1 focus:ring-primary focus:border-primary placeholder-muted-foreground transition-colors"
+                        placeholder="Buscar paciente..."
+                    >
+                </div>
+
+                <div class="w-full sm:w-auto">
+                    <input 
+                        type="date" 
+                        wire:model.blur="filtroStudyDate"
+                        class="w-full sm:w-auto px-3 py-2 text-sm bg-card border border-border text-foreground rounded-lg focus:ring-1 focus:ring-primary focus:border-primary transition-colors cursor-pointer"
+                    >
+                </div>
+
                 <button
                     wire:click="getExames" 
-                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-card text-foreground border border-border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors shadow-sm"
+                    class="inline-flex justify-center items-center gap-2 px-3 py-2 text-sm font-medium bg-card text-foreground border border-border rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors shadow-sm whitespace-nowrap"
+                    title="Atualizar lista"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    Atualizar exames
+                    <span class="sm:hidden lg:inline">Atualizar</span>
                 </button>
             </div>
         </div>
 
-        <!-- Tabela de dados -->
         <div class="bg-card border border-border rounded-lg overflow-hidden">
             @if(count($studies) > 0)
                 <table class="w-full">
@@ -109,7 +132,6 @@
             @endif
         </div>
 
-        <!-- Paginação -->
         @if($studies->hasPages())
             <div class="mt-6 flex items-center justify-between">
                 <div class="text-sm text-muted-foreground">

@@ -6,12 +6,15 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Study;
 use App\Models\Instance;
+use Carbon\Carbon;
 
 class Exames extends Component
 {
     use WithPagination;
 
     public $filtro = 'pendente';
+    public $filtroPaciente = '';
+    public $filtroStudyDate;
     public array $openStudies = [];
 
     
@@ -50,6 +53,18 @@ class Exames extends Component
 
         $this->dispatch('toast-success', message: 'Exames atualizados!');
     }
+
+    public function updatedFiltroStudyDate()
+    {
+        $this->resetPage();
+    }
+
+    public function mount()
+    {
+        $this->filtroStudyDate ??= now()->toDateString();
+    }
+
+    
     /**
      * Monta os dados para a view do componente, aplicando filtro e paginação.
      *
@@ -63,6 +78,12 @@ class Exames extends Component
                     $q->where('status', $this->filtro);
                 }
             })
+            ->whereHas('patient', function ($q) {
+                if (!empty($this->filtroPaciente)) {
+                    $q->where('nome', 'like', '%' . $this->filtroPaciente . '%');
+                }
+            })
+            ->whereDate('study_date', $this->filtroStudyDate)
             ->orderBy('study_date', 'DESC')
             ->paginate(5);
             
