@@ -49,8 +49,8 @@
             <div class="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-muted-foreground text-sm mb-2">Urgentes</p>
-                        <p class="text-3xl font-semibold text-destructive">{{ $stats['urgentes'] }}</p>
+                        <p class="text-muted-foreground text-sm mb-2">Exames Rejeitados</p>
+                        <p class="text-3xl font-semibold text-destructive">{{ $stats['exames_rejeitados'] }}</p>
                     </div>
                     <div class="w-12 h-12 bg-destructive/10 rounded-lg flex items-center justify-center">
                         <svg class="w-6 h-6 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,8 +73,8 @@
                     <canvas 
                         id="examesTempoChart"
                         data-labels="{{ json_encode($examesTempo['labels']) }}"
-                        data-exames="{{ json_encode($examesTempo['exames']) }}"
-                        data-laudos="{{ json_encode($examesTempo['laudos']) }}"
+                        data-exames="{{ json_encode($examesTempo['data']) }}"
+                        data-laudos="{{ json_encode($examesTempo['laudados']) }}"
                     ></canvas>
                 </div>
             </div>
@@ -97,14 +97,14 @@
             <!-- Gráfico de Exames por Modalidade -->
             <div class="bg-card border border-border rounded-lg p-6">
                 <div class="mb-4">
-                    <h3 class="text-lg font-semibold text-foreground mb-1">Exames por Modalidade</h3>
-                    <p class="text-sm text-muted-foreground">Quantidade de exames realizados por tipo de modalidade</p>
+                    <h3 class="text-lg font-semibold text-foreground mb-1">Partes Mais Examinadas</h3>
+                    <p class="text-sm text-muted-foreground">Quantidade de exames realizados por parte do corpo</p>
                 </div>
                 <div class="h-64">
                     <canvas 
                         id="examesModalidadeChart"
-                        data-labels="{{ json_encode($examesModalidade['labels']) }}"
-                        data-values="{{ json_encode($examesModalidade['data']) }}"
+                        data-labels="{{ json_encode($examesBodyPartExamined['labels']) }}"
+                        data-values="{{ json_encode($examesBodyPartExamined['data']) }}"
                     ></canvas>
                 </div>
             </div>
@@ -117,7 +117,7 @@
                 </div>
                 <div class="h-64">
                     <canvas 
-                        id="performanceLaudosChart"
+                        id="examesRejeitosChart"
                         data-labels="{{ json_encode($performanceLaudos['labels']) }}"
                         data-values="{{ json_encode($performanceLaudos['data']) }}"
                     ></canvas>

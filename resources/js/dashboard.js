@@ -250,21 +250,19 @@ export function initExamesModalidadeChart() {
     });
 }
 
-// Função para criar gráfico de área (Performance de Laudos)
-export function initPerformanceLaudosChart() {
-    const ctx = document.getElementById('performanceLaudosChart');
+export function initExamesRejeitosChart() {
+    const ctx = document.getElementById('examesRejeitosChart');
     if (!ctx) return;
 
-    // Obter dados dos atributos data-*
     const labels = JSON.parse(ctx.getAttribute('data-labels') || '[]');
     const values = JSON.parse(ctx.getAttribute('data-values') || '[]');
 
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: labels,
+            labels,
             datasets: [{
-                label: 'Tempo Médio (horas)',
+                label: 'Exames rejeitados',
                 data: values,
                 borderColor: themeColors.secondary,
                 backgroundColor: themeColors.secondary + '30',
@@ -272,17 +270,13 @@ export function initPerformanceLaudosChart() {
                 fill: true,
                 pointRadius: 4,
                 pointHoverRadius: 6,
-                animation: {
-                    duration: 2500,
-                    delay: (context) => context.dataIndex * 80,
-                },
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             animation: {
-                duration: 2500,
+                duration: 2000,
                 easing: 'easeInOutQuart',
             },
             plugins: {
@@ -297,9 +291,8 @@ export function initPerformanceLaudosChart() {
                     borderWidth: 1,
                     padding: 12,
                     callbacks: {
-                        label: function(context) {
-                            return 'Tempo médio: ' + context.parsed.y + ' horas';
-                        }
+                        label: (context) =>
+                            `${context.parsed.y} exames rejeitados`
                     }
                 }
             },
@@ -313,16 +306,14 @@ export function initPerformanceLaudosChart() {
                     }
                 },
                 y: {
+                    beginAtZero: true,
                     grid: {
                         color: themeColors.border + '40',
                     },
                     ticks: {
                         color: themeColors.muted,
-                        callback: function(value) {
-                            return value + 'h';
-                        }
-                    },
-                    beginAtZero: false
+                        precision: 0, // evita casas decimais
+                    }
                 }
             }
         }
@@ -335,7 +326,7 @@ export function initDashboardCharts() {
     setTimeout(() => initExamesTempoChart(), 100);
     setTimeout(() => initExamesStatusChart(), 300);
     setTimeout(() => initExamesModalidadeChart(), 500);
-    setTimeout(() => initPerformanceLaudosChart(), 700);
+    setTimeout(() => initExamesRejeitosChart(), 700);
 }
 
 // Exportar função para inicialização manual
