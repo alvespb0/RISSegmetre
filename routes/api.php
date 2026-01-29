@@ -20,3 +20,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::middleware('apiBearer')->get('/exames', [ExameController::class, 'index']);
+Route::middleware('apiBearer')->get('/exames/{id}', [ExameController::class, 'show']);
+Route::middleware('apiBearer')->get('/exames/download-image/{instance_uuid}', [ExameController::class, 'downloadDicom']);

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\ExamesIndexRequest;
 use App\Http\Controllers\Controller;
+use App\Services\DicomService;
+
+use App\Http\Requests\ExamesIndexRequest;
 use Illuminate\Http\Request;
 
 use App\Models\Study;
@@ -11,6 +13,10 @@ use App\Models\Serie;
 use App\Models\Instance;
 
 use Carbon\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Crypt;
+
+use Exception;
 
 class ExameController extends Controller
 {
@@ -24,7 +30,6 @@ class ExameController extends Controller
      */
     public function index(ExamesIndexRequest $request)
     {
-
         $perPage = min(
             (int) $request->query('per_page', 10),
             10
@@ -100,7 +105,7 @@ class ExameController extends Controller
 
         foreach($study->serie as $serie){
             $series[] = [
-                'id' => $serie->id,
+                'uuid' => Crypt::encryptString($serie->serie_external_id),
                 'modality' => $serie->modality,
                 'body_part_examined' => $serie->body_part_examined,
                 'laudo_assinado' => $serie->laudo_assinado,
@@ -122,7 +127,7 @@ class ExameController extends Controller
 
         foreach($serie->instance as $instance){
             $instances[] = [
-                'id' => $instance->id,
+                'uuid' => Crypt::encryptString($instance->instance_external_id),
                 'anamnese' => $instance->anamnese,
                 'status' => $instance->status,
                 'liberado_tecnico' => $instance->liberado_tec
@@ -133,11 +138,40 @@ class ExameController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Realiza o download de uma instância específica de arquivo DICOM.
+     * * O método solicita o arquivo binário via DicomService, gera um nome aleatório
+     * e define os headers apropriados para que o navegador trate o retorno 
+     * como um download de arquivo médico (.dcm).
+     *
+     * @param  \App\Services\DicomService  $dicom         Serviço responsável pela lógica de recuperação do arquivo.
+     * @param  string                      $instance_uuid Identificador único universal da instância DICOM.
+     * * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse 
+     * Retorna o arquivo binário em caso de sucesso (200), 
+     * 404 se não encontrado ou 500 em caso de erro sistêmico.
+     * * @throws \Throwable Captura e loga qualquer falha inesperada durante o processo de recuperação ou stream.
      */
-    public function store(Request $request)
-    {
-        //
+    public function downloadDicom(DicomService $dicom, string $instance_uuid){
+        try{
+            $file = $dicom->downloadInstance($instance_uuid);
+
+            if($file === null){
+                return response()->json([
+                    'error' => 'Instância não encontrada'
+                ], 404);
+            }
+
+            $fileName = Str::random(12);
+
+            return response($file, 200, [
+                'Content-Type' => 'application/dicom',
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '.dcm"',
+            ]);
+        }catch (\Throwable $e) {
+            \Log::error($e);
+            return response()->json([
+                'error' => 'Erro interno do servidor'
+            ], 500);
+        }
     }
 
     /**
@@ -145,7 +179,18 @@ class ExameController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $exame = Study::find($id);
+        
+        if(!$exame){
+            return response()->json([
+                'estudo não encontrado com o id: '. $id
+            ], 404);
+        }
+
+        return response()->json([
+            'data' => $this->mapIndex($exame)
+        ], 200);
+
     }
 
     /**
