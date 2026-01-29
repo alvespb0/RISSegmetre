@@ -15,7 +15,12 @@ use Carbon\Carbon;
 class ExameController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Lista os exames (Studies) com filtros, paginação e mapeamento de dados.
+     * * Este método filtra exames por data e status, garante que apenas instâncias
+     * liberadas tecnicamente sejam exibidas e retorna uma resposta paginada.
+     *
+     * @param  ExamesIndexRequest  $request Objeto de validação contendo filtros (study_date, status, per_page).
+     * @return \Illuminate\Http\JsonResponse Resposta JSON contendo a coleção de exames e metadados de paginação.
      */
     public function index(ExamesIndexRequest $request)
     {
@@ -61,6 +66,12 @@ class ExameController extends Controller
         ], 200);
     }
 
+    /**
+     * Mapeia os dados de um Estudo (Study) para o formato de array de saída da API.
+     *
+     * @param  \App\Models\Study  $study Instância do modelo Study.
+     * @return array<string, mixed> Estrutura formatada do estudo e paciente.
+     */
     private function mapIndex(Study $study): array{
         return [
             'study_id' => $study->id,
@@ -78,6 +89,12 @@ class ExameController extends Controller
         ];
     }
 
+    /**
+     * Transforma as séries associadas a um estudo em um array formatado.
+     *
+     * @param  \App\Models\Study  $study Instância do modelo Study.
+     * @return array<int, array> Lista de séries formatadas.
+     */
     private function mapSeries(Study $study): array{
         $series = [];
 
@@ -94,6 +111,12 @@ class ExameController extends Controller
         return $series;
     }
 
+    /**
+     * Transforma as instâncias associadas a uma série em um array formatado.
+     *
+     * @param  \App\Models\Serie  $serie Instância do modelo Serie.
+     * @return array<int, array> Lista de instâncias (exames técnicos) formatadas.
+     */
     private function mapInstances(Serie $serie): array{
         $instances = [];
 

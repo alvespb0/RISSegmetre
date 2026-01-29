@@ -66,5 +66,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'checkUserType' => \App\Http\Middleware\CheckUserType::class,
         'checkPatientProtocol' => \App\Http\Middleware\CheckPatientProtocol::class,
+        'apiBearer' => \App\Http\Middleware\ApiBearerAuth::class,
     ];
 }
