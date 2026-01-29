@@ -4,12 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Serie extends Model
 {
     protected $table = 'series';
 
     use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'study_id',
@@ -22,6 +25,15 @@ class Serie extends Model
         'motivo_rejeicao',
         'body_part_examined'
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty() 
+            ->dontSubmitEmptyLogs()
+            ->useLogName('series'); // Nome da "gaveta" no log
+    }
 
     public function study(){
         return $this->belongsTo(Study::class, 'study_id');

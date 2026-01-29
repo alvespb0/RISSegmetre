@@ -8,6 +8,7 @@ use App\Models\DeliveryProtocol;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Spatie\Activitylog\Models\Activity;
 
 class PatientLoginController extends Controller
 {
@@ -44,6 +45,16 @@ class PatientLoginController extends Controller
             'serie_id' => $protocol->laudo_id,
             'ip' => $request->ip(),
         ]);
+
+        activity('logins')
+                ->performedOn($protocol)
+                ->causedBy(auth()->user()) 
+                ->withProperties([
+                    'ip' => request()->ip(),
+                    'browser' => request()->userAgent(),
+                    'plataforma' => request()->header('sec-ch-ua-platform')
+                ])
+                ->log('Fez login utilizando o protocolo de entrega.');
 
         session()->put('patient_protocol', $protocol->protocolo);
         

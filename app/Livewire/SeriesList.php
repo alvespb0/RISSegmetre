@@ -11,6 +11,7 @@ use App\Models\Instance;
 
 use App\Services\LaudoService;
 use App\Services\ProtocoloService;
+use Spatie\Activitylog\Models\Activity;
 
 class SeriesList extends Component
 {
@@ -80,8 +81,19 @@ class SeriesList extends Component
     public function gerarProtocolo(){
         try{
             $service = new ProtocoloService();
-
+            
             $service->gerarProtocolo($this->serie);
+
+            activity('protocolos')
+                    ->performedOn($this->serie)
+                    ->causedBy(auth()->user()) 
+                    ->withProperties([
+                        'ip' => request()->ip(),
+                        'browser' => request()->userAgent(),
+                        'plataforma' => request()->header('sec-ch-ua-platform')
+                    ])
+                    ->log('Gerou um novo protocolo de entrega para a série.');
+
             $this->dispatch('toast-success', message: 'Protocolo de entrega gerado com sucesso!');
         }catch (\Exception $e) {
             \Log::error('Erro ao gerar protocolo de entrega da série: ' . $this->serie->id . ', erro: '. $e->getMessage());
@@ -122,6 +134,17 @@ class SeriesList extends Component
      */
     public function baixarLaudo(){
         $idEnc = Crypt::encryptString($this->serie->id);
+
+        activity('downloads')
+                ->performedOn($this->serie)
+                ->causedBy(auth()->user()) 
+                ->withProperties([
+                    'ip' => request()->ip(),
+                    'browser' => request()->userAgent(),
+                    'plataforma' => request()->header('sec-ch-ua-platform')
+                ])
+                ->log('Fez o download de laudo.');
+
         redirect()->route('baixar.laudo', $idEnc);
     }
 
@@ -132,6 +155,17 @@ class SeriesList extends Component
      */
     public function baixarProtocolo(){
         $idEnc = Crypt::encryptString($this->serie->id);
+
+        activity('downloads')
+                ->performedOn($this->serie)
+                ->causedBy(auth()->user()) 
+                ->withProperties([
+                    'ip' => request()->ip(),
+                    'browser' => request()->userAgent(),
+                    'plataforma' => request()->header('sec-ch-ua-platform')
+                ])
+                ->log('Fez o download de protocolo.');
+
         redirect()->route('baixar.protocolo', $idEnc);
     }
 

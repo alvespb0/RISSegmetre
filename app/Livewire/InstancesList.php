@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Crypt;
 
 use Illuminate\Support\Facades\Log;
+use Spatie\Activitylog\Models\Activity;
 
 class InstancesList extends Component
 {
@@ -83,6 +84,16 @@ class InstancesList extends Component
      */
     public function downloadDCM(){
         $idEnc = Crypt::encryptString($this->instance->instance_external_id);
+
+        activity('downloads')
+                ->performedOn($this->instance)
+                ->causedBy(auth()->user()) 
+                ->withProperties([
+                    'ip' => request()->ip(),
+                    'browser' => request()->userAgent(),
+                    'plataforma' => request()->header('sec-ch-ua-platform')
+                ])
+                ->log('Fez o download das imagens.');
 
         return redirect()->route('baixar.dicom', $idEnc);
     }
