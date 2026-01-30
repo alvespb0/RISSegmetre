@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\DicomService;
 
 use App\Http\Requests\ExamesIndexRequest;
+use App\Http\Requests\LaudoRequest;
 use Illuminate\Http\Request;
 
 use App\Models\Study;
@@ -15,6 +16,7 @@ use App\Models\Instance;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 
 use Exception;
 
@@ -193,12 +195,67 @@ class ExameController extends Controller
 
     }
 
+    public function setLaudo(LaudoRequest $request, $id){
+        $exame = Study::find($id);
+
+        if(!$exame){
+            return response()->json([
+                'error' => 'Estudo não encontrado',
+                'id' => $id
+            ], 404);
+        }
+
+        $pdfBin = base64_decode($request->laudo_pdf, true);
+
+        if ($pdfBin === false) {
+            return response()->json([
+                'error' => 'Base64 inválido'
+            ], 422);
+        }
+
+        if (substr($pdfBin, 0, 4) !== '%PDF') {
+            return response()->json([
+                'error' => 'Arquivo não é um PDF válido'
+            ], 422);
+        }
+
+        $fileName = 'laudo_'.Str::uuid().'pdf';
+        $filePath = 'laudos/'.$fileName;
+
+        try{
+            if (!empty($exame->serie->laudo_path)) {
+                Storage::delete($exame->serie->laudo_path);
+            }
+
+            storage::put($filePath, $pdfBin);
+
+            $exame->serie->instance()->update([
+                'status' => $request->status
+            ]);
+
+            $exame->serie->update([
+                'laudo_path' => $filePath,
+                'laudo' => $request->laudo_texto
+            ]);
+
+            return response()->json([
+                'message' => 'Laudo salvo com sucesso'
+            ], 200);
+        }catch (\Throwable $e) {
+            \Log::error('Erro ao salvar laudo: '. $e);
+
+            return response()->json([
+                'error' => 'Erro interno ao salvar laudo'
+            ], 500);
+        }
+
+    }
+
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        //
     }
 
     /**
