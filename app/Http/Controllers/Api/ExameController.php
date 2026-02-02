@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\Study;
 use App\Models\Serie;
 use App\Models\Instance;
+use App\Models\Laudo;
 
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -108,7 +109,6 @@ class ExameController extends Controller
                 'uuid' => Crypt::encryptString($serie->serie_external_id),
                 'modality' => $serie->modality,
                 'body_part_examined' => $serie->body_part_examined,
-                'laudo_assinado' => $serie->laudo_assinado,
                 'instances' => $this->mapInstances($serie)
             ];
         }
@@ -245,15 +245,22 @@ class ExameController extends Controller
                 Storage::delete($exame->serie->first()->laudo_path);
             }
 
+            if(!empty($exame->laudo)){
+                $exame->laudo()->update([
+                    'ativo' => false
+                ]);
+            }
             storage::put($filePath, $pdfBin);
 
             $exame->update([
                 'status' => $request->status
             ]);
 
-            $exame->serie->first()->update([
+            Laudo::create([
+                'study_id' => $exame->id,
+                'medico_id' => $request->medico_id,
+                'laudo' => $request->laudo,
                 'laudo_path' => $filePath,
-                'laudo' => $request->laudo_texto
             ]);
 
             return response()->json([

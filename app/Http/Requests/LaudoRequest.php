@@ -40,6 +40,7 @@ class LaudoRequest extends FormRequest
                     }
                 },
             ],
+            'medico_id' => 'required|exists:medicos_laudo,id'
         ];
     }
 
@@ -53,6 +54,9 @@ class LaudoRequest extends FormRequest
             'laudo_texto.min'      => 'O texto do laudo deve ter pelo menos :min caracteres.',
 
             'laudo_pdf.required'   => 'O PDF do laudo é obrigatório.',
+
+            'medico_id.exists' => 'O médico não está cadastrado',
+            'medico_id.required' => 'O campo medico_id é obrigatório'
         ];
     }
 
