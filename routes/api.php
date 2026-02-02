@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ExameController;
+use App\Http\Controllers\Api\MedicoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +20,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('apiBearer')->get('/exames', [ExameController::class, 'index']);
-Route::middleware('apiBearer')->get('/exames/{id}', [ExameController::class, 'show']);
-Route::middleware('apiBearer')->get('/exames/download-image/{instance_uuid}', [ExameController::class, 'downloadDicom']);
-Route::middleware('apiBearer')->post('/exames/laudar/{id}', [ExameController::class, 'setLaudo']);
+Route::middleware('apiBearer')->get('/exames', [ExameController::class, 'index'])->name('api.show.all-exames');
+Route::middleware('apiBearer')->get('/exames/{id}', [ExameController::class, 'show'])->name('api.show-exame');
+Route::middleware('apiBearer')->get('/exames/download-image/{instance_uuid}', [ExameController::class, 'downloadDicom'])->name('api.download-dicom');
+Route::middleware('apiBearer')->post('/exames/laudar/{id}', [ExameController::class, 'setLaudo'])->name('api.set-laudo');
+Route::middleware('apiBearer')->post('/medico/cadastrar', [MedicoController::class, 'store'])->name('api.store-medico');
+Route::middleware('apiBearer')->get('/medico', [MedicoController::class, 'index'])->name('api.show.all-medico');
+Route::middleware('apiBearer')->get('/medico/{id}', [MedicoController::class, 'show'])->name('api.show-medico');

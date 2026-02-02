@@ -50,13 +50,12 @@ class ExameController extends Controller
             $exames->where('status', $request->status);
         }
 
-        $exames = $exames
-                ->with(['patient', 'serie.instance'])
-                ->whereHas('serie.instance', function ($q){
-                    $q->where('liberado_tec', true);
-                })
-                ->orderByDesc('study_date')
-                ->paginate($perPage);
+        $exames = $exames->with(['patient', 'serie.instance'])
+                    ->whereHas('serie.instance', function ($q){
+                        $q->where('liberado_tec', true);
+                    })
+                    ->orderByDesc('study_date')
+                    ->paginate($perPage);
         
         return response()->json([
             'data' => $exames->getCollection()->map(
