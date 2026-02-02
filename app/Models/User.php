@@ -22,10 +22,12 @@ class User extends Authenticatable
         'email',
         'password',
         'tipo',
-        'signature_path',
         'medico_id'
     ];
 
+    public function medico(){
+        return $this->belongsTo(MedicoLaudo::class, 'medico_id');
+    }
     /**
      * The attributes that should be hidden for serialization.
      *

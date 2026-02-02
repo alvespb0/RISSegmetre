@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('nome');
             $table->string('especialidade');
             $table->string('conselho_classe');
+            $table->string('signature_path')->nullable();
             $table->softDeletes();
             $table->foreign('empresas_laudo_id')->references('id')->on('empresas_laudo')->nullOnDelete();
             $table->timestamps();

@@ -17,7 +17,8 @@ class MedicoLaudo extends Model
         'empresas_laudo_id',
         'nome',
         'especialidade',
-        'conselho_classe'
+        'conselho_classe',
+        'signature_path',
     ];
 
     public function empresa(){

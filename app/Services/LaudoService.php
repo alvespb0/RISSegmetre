@@ -28,7 +28,7 @@ class LaudoService
      *
      * @return array{pdf:string} Array com o caminho do PDF gerado.
      */
-    public function gerarLaudo(Serie $serie, $laudo){
+    public function gerarLaudo(Serie $serie, $laudo, $medico){
         $templatePath = storage_path('app/modelos/Modelo-Laudo-RX.docx');
 
         $template = new TemplateProcessor($templatePath);
@@ -39,7 +39,7 @@ class LaudoService
         $aniversario = $serie->study->patient->birth_date;
         $dataExame = $serie->study->study_date;
         $exame = 'Raio X '.$serie->body_part_examined;
-        $nomeMedicoRx = $serie->medico->name;
+        $nomeMedicoRx = $medico->nome;
 
         $template->setValue('nomePaciente', $paciente);
         $template->setValue('idadePaciente', $idade);
@@ -50,7 +50,6 @@ class LaudoService
         $template->setValue('textoLaudo', $laudo);
         $template->setValue('nomeMedicoRx', $nomeMedicoRx);
         
-        $medico = $serie->medico;
         if ($medico && !empty($medico->signature_path)) {
             $assinaturaPath = storage_path('app/' . $medico->signature_path);
             

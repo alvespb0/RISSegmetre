@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Crypt;
 
 use Livewire\Component;
 use App\Models\Serie;
+use App\Models\Laudo;
 use App\Models\Instance;
 
 use App\Services\LaudoService;
@@ -46,16 +47,22 @@ class SeriesList extends Component
      */
     public function setLaudo(){
         try{
-            $this->serie->update([
-                'laudo' => $this->laudo,
-                'medico_id' => Auth::id()
-            ]);
-            
+            $medico = Auth::user()->medico;
+
             $service = new LaudoService;
 
-            $file = $service->gerarLaudo($this->serie, $this->laudo);
+            $file = $service->gerarLaudo($this->serie, $this->laudo, $medico);
 
-            $this->serie->update([
+            if(!empty($this->serie->study->laudo)){
+                $this->serie->study->laudo()->update([
+                    'ativo' => false
+                ]);
+            }
+
+            Laudo::create([
+                'study_id' => $this->serie->study->id,
+                'medico_id' => $medico->id,
+                'laudo' => $this->laudo,
                 'laudo_path' => $file['pdf'],
             ]);
 
@@ -111,7 +118,6 @@ class SeriesList extends Component
     public function setRejeicao(){
         try{
             $this->serie->update([
-                'medico_id' => Auth::id(),
                 'motivo_rejeicao' => $this->rejeicao
             ]);
             
@@ -133,7 +139,7 @@ class SeriesList extends Component
      * @return void
      */
     public function baixarLaudo(){
-        $idEnc = Crypt::encryptString($this->serie->id);
+        $idEnc = Crypt::encryptString($this->serie->study->id);
 
         activity('downloads')
                 ->performedOn($this->serie)

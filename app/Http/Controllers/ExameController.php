@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Crypt;
 
 use App\Models\Serie;
+use App\Models\Study;
 use Illuminate\Support\Facades\Storage;
 
 class ExameController extends Controller
@@ -49,9 +50,9 @@ class ExameController extends Controller
     public function getLaudoFile($idEnc){
         $id = Crypt::decryptString($idEnc);
 
-        $serie = Serie::findOrFail($id);
+        $exame = Study::findOrFail($id);
 
-        $path = $serie->laudo_path;
+        $path = $exame->laudo()->where('ativo', true)->first()?->laudo_path;
 
         if (!Storage::exists($path)) {
             \Log::error("Erro ao baixar laudo da serie: {$id}, path inexistente");

@@ -21,7 +21,7 @@ class DeliveryProtocol extends Model
         'last_view_at', #dateTime
     ];
 
-    public function laudo(){
+    public function serie(){
         return $this->belongsTo(Serie::class, 'laudo_id');
     }
 }

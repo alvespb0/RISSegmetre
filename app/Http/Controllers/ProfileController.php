@@ -43,6 +43,7 @@ class ProfileController extends Controller
     public function updateSignature(Request $request): RedirectResponse
     {
         $user = $request->user();
+
         $request->validate([
             'signature' => [
                 'required',
@@ -111,7 +112,7 @@ class ProfileController extends Controller
         imagedestroy($src);
         imagedestroy($dst);
 
-        $user->update([
+        $user->medico()->update([
             'signature_path' => $relativePath,
         ]);
 

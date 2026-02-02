@@ -20,6 +20,7 @@ class Laudo extends Model
         'laudo', #texto
         'laudo_path',
         'laudo_assinado',
+        'ativo'
     ];
 
     public function study(){

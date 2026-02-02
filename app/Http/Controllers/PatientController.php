@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\DeliveryProtocol;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class PatientController extends Controller
 {
@@ -14,7 +15,7 @@ class PatientController extends Controller
         
         $modelProtocol = DeliveryProtocol::where('protocolo', $protocolo)->firstOrFail();
 
-        $serie = $modelProtocol->laudo;
+        $serie = $modelProtocol->serie;
 
         return view('exames/patient_index', ['serie' => $serie]);
     }
@@ -30,14 +31,20 @@ class PatientController extends Controller
 
         $modelProtocol = DeliveryProtocol::where('protocolo', $protocolo)->firstOrFail();
 
-        $path = $modelProtocol->laudo->laudo_path;
+        $path = $modelProtocol->serie->study
+                            ->laudo()
+                            ->where('ativo', true)
+                            ->first()
+                            ->laudo_path;
 
-        if(!file_exists($path)){
-            \Log::error('Erro ao baixar laudo do protocolo: '.$protocoloEnc.', path inexistente');
-            abort(500);
+        if (!Storage::exists($path)) {
+            \Log::error(
+                'Erro ao baixar laudo do protocolo: '.$protocoloEnc.', path inexistente: '.$path
+            );
+            abort(404);
         }
 
-        return response()->download($path);
+        return Storage::download($path);
     }
 
     public function downloadImagemJpg($idEnc){ #external_id
@@ -47,7 +54,7 @@ class PatientController extends Controller
 
         $modelProtocol = DeliveryProtocol::where('protocolo', $sessionProtocol)->firstOrFail();
 
-        if(! $modelProtocol->laudo->instance()->where('instance_external_id', $id)->exists()){
+        if(! $modelProtocol->serie->instance()->where('instance_external_id', $id)->exists()){
             abort(403, 'Acesso não autorizado.');
         }
 

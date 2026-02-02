@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('laudos', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('study_id');
-            $table->unsignedBigInteger('empresa_id');
+            $table->unsignedBigInteger('empresa_id')->nullable(); # se não for laudado externamente, não vai receber empresa_id
             $table->unsignedBigInteger('medico_id');
             $table->text('laudo')->nullable();
             $table->text('laudo_path')->nullable();

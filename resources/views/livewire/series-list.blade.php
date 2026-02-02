@@ -53,9 +53,9 @@
                                     @click="modalLaudoOpen = true"
                                 >
                                     @if(Auth::user()->tipo == 'medico')
-                                        {{ $serie->laudo ? 'Editar Laudo' : 'Digitar Laudo'}}
+                                        {{ $serie->study->laudo ? 'Editar Laudo' : 'Digitar Laudo'}}
                                     @else
-                                        {{ $serie->laudo ? 'Ver Laudo' : 'Sem Laudo'}}
+                                        {{ $serie->study->laudo ? 'Ver Laudo' : 'Sem Laudo'}}
                                     @endif
                                 </button>
                             @endif
@@ -295,7 +295,7 @@
                         
                         {{-- Modo Visualização (Para quem não é médico) --}}
                         <div x-show="!isMedico" class="w-full px-4 py-3 bg-muted/20 border border-border rounded-lg min-h-[300px] overflow-y-auto italic text-muted-foreground">
-                            {{ $serie->laudo ?? 'O laudo ainda não foi emitido pelo médico responsável.' }}
+                            {{ $serie->study->laudo()->where('ativo', true)->first()->laudo ?? 'O laudo ainda não foi emitido pelo médico responsável.' }}
                         </div>
 
                         {{-- Modo Edição (Apenas para Médicos) --}}
