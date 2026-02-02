@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('study_instance_id');
             $table->string('solicitante');
             $table->date('study_date');
+            $table->enum('status', ['pendente', 'laudado', 'rejeitado'])->default('pendente');
             $table->foreign('patient_id')->references('id')->on('patients')->onDelete('cascade');
             $table->timestamps();
         });

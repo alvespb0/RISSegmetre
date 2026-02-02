@@ -19,7 +19,6 @@ class Instance extends Model
         'instance_external_id',
         'file_uuid',
         'anamnese',
-        'status',
         'liberado_tec',
     ];
 

@@ -71,56 +71,71 @@
         <div class="bg-card border border-border rounded-lg overflow-hidden">
             @if(count($studies) > 0)
                 <table class="w-full">
-                    <thead>
-                        <tr class="border-b border-border bg-muted/50">
-                            <th class="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Nome do Paciente</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Sexo do Paciente</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Data do Estudo</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Médico Solicitante</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($studies as $study)
-                            <tr class="border-b border-border hover:bg-accent/50 transition-colors">
-                                <td class="px-6 py-4">
-                                    <span class="font-semibold text-foreground">{{ $study->patient->nome }}</span>
-                                </td>
-                                <td class="px-6 py-4 text-foreground">{{ $study->patient->sexo ?? 'N/A' }}</td>
-                                <td class="px-6 py-4 text-foreground">{{ $study->study_date ?? 'N/A' }}</td>
-                                <td class="px-6 py-4 text-foreground">{{ $study->solicitante ?? 'N/A' }}</td>
-                                <td class="px-6 py-4">
-                                    <button
-                                        wire:click="toggleStudy({{ $study->id }})"
-                                        class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/10 rounded-lg transition-colors"
-                                    >
-                                        <svg class="w-4 h-4 transition-transform {{ ($openStudies[$study->id] ?? false) ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                        {{ ($openStudies[$study->id] ?? false)
-                                            ? 'Ocultar Séries'
-                                            : 'Expandir Séries' }}
-                                    </button>
-                                </td>
-                            </tr>
-                            @if($openStudies[$study->id] ?? false)
-                            <tr>
-                                <td colspan="5" class="px-6 py-4 bg-gradient-to-r from-muted/20 via-muted/10 to-transparent">
-                                    <div class="ml-4 pl-4 border-l-2 border-primary/30 space-y-3">
-                                        @forelse($study->serie as $serie)
-                                            <livewire:SeriesList :serie="$serie" :filtro="$filtro" :wire:key="$serie->id"/>
-                                        @empty
-                                            <div class="ml-6 pl-4 py-3 text-sm text-muted-foreground italic bg-card/50 border border-border/50 rounded-lg">
-                                                Nenhuma série encontrada para este estudo
-                                            </div>
-                                        @endforelse
-                                    </div>
-                                </td>
-                            </tr>
-                            @endif
-                        @endforeach
-                    </tbody>
-                </table>
+    <thead>
+        <tr class="border-b border-border bg-muted/50">
+            <th class="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Nome do Paciente</th>
+            <th class="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Sexo do Paciente</th>
+            <th class="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Data do Estudo</th>
+            <th class="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Médico Solicitante</th>
+            <th class="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Status</th>
+            <th class="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($studies as $study)
+            <tr class="border-b border-border hover:bg-accent/50 transition-colors">
+                <td class="px-6 py-4">
+                    <span class="font-semibold text-foreground">{{ $study->patient->nome }}</span>
+                </td>
+                <td class="px-6 py-4 text-foreground">{{ $study->patient->sexo ?? 'N/A' }}</td>
+                <td class="px-6 py-4 text-foreground">{{ $study->study_date ?? 'N/A' }}</td>
+                <td class="px-6 py-4 text-foreground">{{ $study->solicitante ?? 'N/A' }}</td>
+                
+                <td class="px-6 py-4">
+                    @php
+                        $statusStyles = [
+                            'pendente' => 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800',
+                            'laudado'  => 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800',
+                            'rejeitado' => 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800',
+                        ];
+                        $currentStatus = strtolower($study->status ?? 'pendente');
+                    @endphp
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border {{ $statusStyles[$currentStatus] ?? $statusStyles['pendente'] }}">
+                        {{ ucfirst($currentStatus) }}
+                    </span>
+                </td>
+
+                <td class="px-6 py-4">
+                    <button
+                        wire:click="toggleStudy({{ $study->id }})"
+                        class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                    >
+                        <svg class="w-4 h-4 transition-transform {{ ($openStudies[$study->id] ?? false) ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                        {{ ($openStudies[$study->id] ?? false) ? 'Ocultar Séries' : 'Expandir Séries' }}
+                    </button>
+                </td>
+            </tr>
+
+            @if($openStudies[$study->id] ?? false)
+            <tr>
+                <td colspan="6" class="px-6 py-4 bg-gradient-to-r from-muted/20 via-muted/10 to-transparent">
+                    <div class="ml-4 pl-4 border-l-2 border-primary/30 space-y-3">
+                        @forelse($study->serie as $serie)
+                            <livewire:SeriesList :serie="$serie" :filtro="$filtro" :wire:key="'serie-'.$serie->id"/>
+                        @empty
+                            <div class="ml-6 pl-4 py-3 text-sm text-muted-foreground italic bg-card/50 border border-border/50 rounded-lg">
+                                Nenhuma série encontrada para este estudo
+                            </div>
+                        @endforelse
+                    </div>
+                </td>
+            </tr>
+            @endif
+        @endforeach
+    </tbody>
+</table>
             @else
                 <div class="p-12 text-center">
                     <svg class="w-16 h-16 text-muted-foreground mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

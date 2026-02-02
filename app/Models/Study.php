@@ -19,6 +19,7 @@ class Study extends Model
         'study_external_id',
         'study_instance_id',
         'solicitante',
+        'status', # enum
         'study_date',
     ];
 

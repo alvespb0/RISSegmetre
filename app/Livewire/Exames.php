@@ -73,10 +73,8 @@ class Exames extends Component
     public function render()
     {
         $studies = Study::with(['patient', 'serie.instance'])
-            ->whereHas('serie.instance', function ($q) {
-                if ($this->filtro !== 'todos') {
-                    $q->where('status', $this->filtro);
-                }
+            ->when($this->filtro !== 'todos', function ($q) {
+                $q->where('status', $this->filtro);
             })
             ->whereHas('patient', function ($q) {
                 if (!empty($this->filtroPaciente)) {

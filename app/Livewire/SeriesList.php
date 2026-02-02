@@ -59,7 +59,7 @@ class SeriesList extends Component
                 'laudo_path' => $file['pdf'],
             ]);
 
-            $this->serie->instance()->update([
+            $this->serie->study->update([
                 'status' => 'laudado'
             ]);
 
@@ -115,7 +115,7 @@ class SeriesList extends Component
                 'motivo_rejeicao' => $this->rejeicao
             ]);
             
-            $this->serie->instance()->update([
+            $this->serie->study->update([
                 'status' => 'rejeitado'
             ]);
 
@@ -151,7 +151,7 @@ class SeriesList extends Component
     /**
      * Redireciona para a rota de download do protocolo de entrega da série.
      *
-     * @return void
+     * @return void-
      */
     public function baixarProtocolo(){
         $idEnc = Crypt::encryptString($this->serie->id);

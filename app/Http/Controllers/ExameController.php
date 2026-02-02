@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Crypt;
 
 use App\Models\Serie;
+use Illuminate\Support\Facades\Storage;
 
 class ExameController extends Controller
 {
@@ -52,12 +53,12 @@ class ExameController extends Controller
 
         $path = $serie->laudo_path;
 
-        if(!file_exists($path)){
-            \Log::error('Erro ao baixar laudo da serie: '.$id.', path inexistente');
-            abort(500);
+        if (!Storage::exists($path)) {
+            \Log::error("Erro ao baixar laudo da serie: {$id}, path inexistente");
+            abort(404);
         }
 
-        return response()->download($path);
+        return Storage::download($path);
     }
 
     public function getProtocoloFile($idEnc){

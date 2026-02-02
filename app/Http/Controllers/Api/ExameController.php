@@ -44,10 +44,7 @@ class ExameController extends Controller
         }
 
         if(!empty($request->status)){
-            $status = $request->status;
-            $exames->whereHas('serie.instance', function ($q) use ($status){
-                $q->where('status', $status);
-            });
+            $exames->where('status', $request->status);
         }
 
         $exames = $exames
@@ -84,7 +81,8 @@ class ExameController extends Controller
             'study_id' => $study->id,
             'study_date' => $study->study_date,
             'medico_solicitante' => $study->solicitante,
-            
+            'status' => $study->status,
+
             'patient' => [
                 'id' => $study->patient->id,
                 'nome' => $study->patient->nome,
@@ -131,7 +129,6 @@ class ExameController extends Controller
             $instances[] = [
                 'uuid' => Crypt::encryptString($instance->instance_external_id),
                 'anamnese' => $instance->anamnese,
-                'status' => $instance->status,
                 'liberado_tecnico' => $instance->liberado_tec
             ];
         }
@@ -205,6 +202,8 @@ class ExameController extends Controller
             ], 404);
         }
 
+        $exame->first();
+
         $pdfBin = base64_decode($request->laudo_pdf, true);
 
         if ($pdfBin === false) {
@@ -219,21 +218,21 @@ class ExameController extends Controller
             ], 422);
         }
 
-        $fileName = 'laudo_'.Str::uuid().'pdf';
+        $fileName = 'laudo_'.Str::uuid().'.pdf';
         $filePath = 'laudos/'.$fileName;
 
         try{
-            if (!empty($exame->serie->laudo_path)) {
-                Storage::delete($exame->serie->laudo_path);
+            if (!empty($exame->serie->first()->laudo_path)) {
+                Storage::delete($exame->serie->first()->laudo_path);
             }
 
             storage::put($filePath, $pdfBin);
 
-            $exame->serie->instance()->update([
+            $exame->update([
                 'status' => $request->status
             ]);
 
-            $exame->serie->update([
+            $exame->serie->first()->update([
                 'laudo_path' => $filePath,
                 'laudo' => $request->laudo_texto
             ]);

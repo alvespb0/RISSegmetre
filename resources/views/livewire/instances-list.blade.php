@@ -43,14 +43,6 @@
                 </div>
 
                 <div class="flex items-center gap-2 flex-shrink-0">
-                    <span class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md
-                        @if($instance->status === 'laudado') bg-green-500/10 text-green-600 dark:text-green-400
-                        @elseif($instance->status === 'rejeitado') bg-red-500/10 text-red-600 dark:text-red-400
-                        @else bg-yellow-500/10 text-yellow-600 dark:text-yellow-400
-                        @endif">
-                        {{ ucfirst($instance->status ?? 'pendente') }}
-                    </span>
-
                     {{-- Botão Download DCM --}}
                     <button 
                         class="p-1.5 text-primary hover:bg-primary/10 rounded-md transition-colors" 

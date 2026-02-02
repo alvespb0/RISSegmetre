@@ -86,20 +86,18 @@ class LaudoService
         
         sleep(1);
 
-        $finalDir = storage_path('app/laudos');
-        if (!is_dir($finalDir)) {
-            mkdir($finalDir, 0755, true);
-        }
+        $storagePath = 'laudos/laudo_' . $serie->id . '_' . now()->timestamp . '.pdf';
 
-        $finalPdf = $finalDir . '/laudo_' . $serie->id . '_' . now()->timestamp . '.pdf';
+        // salva usando o Storage
+        Storage::put($storagePath, file_get_contents($pdfPath));
 
-        rename($pdfPath, $finalPdf);
-
+        // limpeza
         @unlink($docxPath);
+        @unlink($pdfPath);
         @rmdir($tmpDir);
 
         return [
-            'pdf' => $finalPdf
+            'pdf' => $storagePath
         ];
     }
 }
