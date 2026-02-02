@@ -13,6 +13,8 @@ use App\Models\Study;
 use App\Models\Serie;
 use App\Models\Instance;
 use App\Models\Laudo;
+use App\Models\MedicoLaudo;
+use App\Models\ApiToken;
 
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -252,6 +254,16 @@ class ExameController extends Controller
             }
             storage::put($filePath, $pdfBin);
 
+            $validaMed = $this->validaMedico($request->medico_id, $request->header('Authorization'));
+
+            if($validaMed !== true){
+                return response()->json([
+                    'error' => $validaMed['error']
+                ], 422);
+            }
+
+            $medico = MedicoLaudo::findOrFail($request->medico_id);
+
             $exame->update([
                 'status' => $request->status
             ]);
@@ -259,7 +271,8 @@ class ExameController extends Controller
             Laudo::create([
                 'study_id' => $exame->id,
                 'medico_id' => $request->medico_id,
-                'laudo' => $request->laudo,
+                'empresa_id' => $medico->empresa->id ?? null,
+                'laudo' => $request->laudo_texto,
                 'laudo_path' => $filePath,
             ]);
 
@@ -273,6 +286,41 @@ class ExameController extends Controller
                 'error' => 'Erro interno ao salvar laudo'
             ], 500);
         }
+    }
+
+    private function validaMedico($medico_id, $authHeader){
+        $token = substr($authHeader, 7);
+        $hashedToken = hash('sha256', $token);
+
+        $tokenModel = ApiToken::with('empresa.medico')
+            ->where('token', $hashedToken)
+            ->first();
+
+        $empresa = $tokenModel->empresa;
+
+        if (!$empresa) {
+            return [
+                'status' => false,
+                'error' => 'Token não possui empresa vinculada'
+            ];
+        }
+
+        if ($empresa->medico->isEmpty()) {
+            return [
+                'status' => false,
+                'error' => 'Empresa não possui médico cadastrado.'
+            ];
+        }
+
+        // Médico informado precisa pertencer à empresa
+        if (!$empresa->medico->contains('id', $medico_id)) {
+            return [
+                'status' => false,
+                'error' => 'Médico informado não pertence à empresa vinculada ao token'
+            ];
+        }
+
+        return true;
     }
 
     public function setRejeicao(Request $request){

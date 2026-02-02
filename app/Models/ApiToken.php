@@ -19,4 +19,7 @@ class ApiToken extends Model
 
     protected $hidden = ['token'];
 
+    public function empresa(){
+        return $this->hasOne(EmpresaLaudo::class, 'token_id');
+    }
 }

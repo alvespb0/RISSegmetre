@@ -22,7 +22,7 @@ class MedicoLaudo extends Model
     ];
 
     public function empresa(){
-        return $this->belongsTo(EmpresasLaudo::class, 'empresas_laudo_id');
+        return $this->belongsTo(EmpresaLaudo::class, 'empresas_laudo_id');
     }
     
     public function laudo(){

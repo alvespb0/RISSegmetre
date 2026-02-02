@@ -92,6 +92,22 @@
             </svg>
             <span>Configurações</span>
         </a>
+
+        @if(Auth::check() && Auth::user()->tipo === 'dev')
+        <!-- API Tokens (Apenas para Desenvolvedores) -->
+        @php
+            $isApiTokensActive = request()->routeIs('dev.*');
+            $apiTokensClasses = $isApiTokensActive 
+                ? 'w-full flex items-center gap-3 px-4 py-3 mb-1 rounded-lg transition-colors bg-sidebar-accent text-sidebar-accent-foreground'
+                : 'w-full flex items-center gap-3 px-4 py-3 mb-1 rounded-lg transition-colors text-sidebar-foreground hover:bg-sidebar-accent/50';
+        @endphp
+        <a href="{{ route('dev.api-tokens') }}" class="{{ $apiTokensClasses }}">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+            </svg>
+            <span>API Tokens</span>
+        </a>
+        @endif
     </nav>
 
     <!-- Botão de Logout -->

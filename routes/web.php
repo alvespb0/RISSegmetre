@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ExameController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +34,12 @@ Route::middleware(['checkUserType:admin,dev,medico,tecnico'])->group(function ()
     Route::get('/configuracoes', function () {
         return view('configuracoes.index');
     })->name('configuracoes.index');
+});
+
+Route::middleware(['checkUserType:dev'])->controller(ApiController::class)->group(function () {
+    Route::get('/dev/api-tokens', 'show')->name('dev.api-tokens');
+    Route::post('/dev/api-tokens', 'store')->name('dev.api-tokens.store');
+    Route::post('/dev/api-tokens/{id}/toggle', 'toggleActive')->name('dev.api-tokens.toggle');
 });
 
 Route::middleware(['checkUserType:admin,dev,tecnico,medico'])->controller(ExameController::class)->group(function (){
