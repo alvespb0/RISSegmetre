@@ -38,4 +38,8 @@ class Study extends Model
     public function serie(){
         return $this->hasMany(Serie::class, 'study_id');
     }
+
+    public function laudo(){
+        return $this->hasMany(Laudo::class, 'study_id');
+    }
 }

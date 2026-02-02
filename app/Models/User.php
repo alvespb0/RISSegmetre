@@ -22,7 +22,8 @@ class User extends Authenticatable
         'email',
         'password',
         'tipo',
-        'signature_path'
+        'signature_path',
+        'medico_id'
     ];
 
     /**

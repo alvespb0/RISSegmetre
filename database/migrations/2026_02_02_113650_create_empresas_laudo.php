@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('empresas_laudo', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('token_id')->unique();
+            $table->string('nome');
+            $table->string('cnpj');
+            $table->softDeletes();
+            $table->foreign('token_id')->references('id')->on('api_tokens')->onDelete('cascade');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('empresas_laudo');
+    }
+};

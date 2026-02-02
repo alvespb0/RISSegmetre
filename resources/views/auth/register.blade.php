@@ -1,103 +1,77 @@
 <x-guest-layout>
-    <div class="mb-6">
+    <div 
+        x-data="{ tipo: '{{ old('tipo') }}' }"
+        class="mb-6"
+    >
         <h2 class="text-2xl font-semibold text-foreground mb-2">Criar nova conta</h2>
         <p class="text-sm text-muted-foreground">Preencha os dados abaixo para se registrar</p>
-    </div>
 
-    <form method="POST" action="{{ route('register') }}" class="space-y-5">
-        @csrf
+        <form method="POST" action="{{ route('register') }}" class="space-y-5">
+            @csrf
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Nome completo')" />
-            <x-text-input 
-                id="name" 
-                type="text" 
-                name="name" 
-                :value="old('name')" 
-                required 
-                autofocus 
-                autocomplete="name"
-                placeholder="Seu nome completo"
-            />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-        </div>
+            <!-- Nome -->
+            <div>
+                <x-input-label for="name" value="Nome completo" />
+                <x-text-input id="name" name="name" type="text" required />
+            </div>
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input 
-                id="email" 
-                type="email" 
-                name="email" 
-                :value="old('email')" 
-                required 
-                autocomplete="username"
-                placeholder="seu@email.com"
-            />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+            <!-- Email -->
+            <div>
+                <x-input-label for="email" value="Email" />
+                <x-text-input id="email" name="email" type="email" required />
+            </div>
 
-        <!-- Password -->
-        <div>
-            <x-input-label for="password" :value="__('Senha')" />
-            <x-text-input 
-                id="password"
-                type="password"
-                name="password"
-                required 
-                autocomplete="new-password"
-                placeholder="••••••••"
-            />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+            <!-- Senha -->
+            <div>
+                <x-input-label for="password" value="Senha" />
+                <x-text-input id="password" name="password" type="password" required />
+            </div>
 
-        <!-- Confirm Password -->
-        <div>
-            <x-input-label for="password_confirmation" :value="__('Confirmar senha')" />
-            <x-text-input 
-                id="password_confirmation"
-                type="password"
-                name="password_confirmation" 
-                required 
-                autocomplete="new-password"
-                placeholder="••••••••"
-            />
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
+            <!-- Confirmar senha -->
+            <div>
+                <x-input-label for="password_confirmation" value="Confirmar senha" />
+                <x-text-input id="password_confirmation" name="password_confirmation" type="password" required />
+            </div>
 
-        <!-- Tipo de Usuário -->
-        <div>
-            <x-input-label for="tipo" :value="__('Tipo de usuário')" />
-            <select 
-                id="tipo" 
-                name="tipo" 
-                required
-                class="w-full px-4 py-2.5 bg-input-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+            <!-- Tipo -->
+            <div>
+                <x-input-label for="tipo" value="Tipo de usuário" />
+                <select
+                    id="tipo"
+                    name="tipo"
+                    x-model="tipo"
+                    required
+                    class="w-full px-4 py-2.5 bg-input-background border border-border rounded-lg"
+                >
+                    <option value="">Selecione o tipo</option>
+                    <option value="admin">Administrador</option>
+                    <option value="medico">Médico</option>
+                    <option value="tecnico">Técnico</option>
+                    <option value="dev">Desenvolvedor</option>
+                </select>
+            </div>
+
+            <!-- Campos extras do médico -->
+            <div
+                x-show="tipo === 'medico'"
+                x-transition
+                x-cloak
+                class="space-y-5"
             >
-                <option value="">Selecione o tipo</option>
-                <option value="admin" {{ old('tipo') === 'admin' ? 'selected' : '' }}>Administrador</option>
-                <option value="medico" {{ old('tipo') === 'medico' ? 'selected' : '' }}>Médico</option>
-                <option value="tecnico" {{ old('tipo') === 'tecnico' ? 'selected' : '' }}>Técnico</option>
-                <option value="paciente" {{ old('tipo') === 'paciente' ? 'selected' : '' }}>Paciente</option>
-                <option value="dev" {{ old('tipo') === 'dev' ? 'selected' : '' }}>Desenvolvedor</option>
-            </select>
-            <x-input-error :messages="$errors->get('tipo')" class="mt-2" />
-        </div>
+                <div>
+                    <x-input-label for="especialidade" value="Especialidade" />
+                    <x-text-input id="especialidade" name="especialidade" type="text" />
+                </div>
 
-        <div class="pt-2">
+                <div>
+                    <x-input-label for="conselho_classe" value="Conselho de Classe (CRM)" />
+                    <x-text-input id="conselho_classe" name="conselho_classe" type="text" />
+                </div>
+            </div>
+
             <x-primary-button class="w-full">
-                {{ __('Criar conta') }}
+                Criar conta
             </x-primary-button>
-        </div>
-    </form>
-
-    <div class="mt-6 text-center">
-        <p class="text-sm text-muted-foreground">
-            Já tem uma conta?
-            <a href="{{ route('login') }}" class="text-primary hover:text-primary/80 font-medium transition-colors">
-                {{ __('Fazer login') }}
-            </a>
-        </p>
+        </form>
     </div>
 </x-guest-layout>

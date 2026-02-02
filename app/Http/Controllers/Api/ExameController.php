@@ -192,6 +192,25 @@ class ExameController extends Controller
 
     }
 
+    /**
+     * Salva ou atualiza o laudo radiológico de um estudo específico.
+     *
+     * Este método processa um PDF em Base64, valida a integridade do arquivo, 
+     * gerencia o armazenamento físico no storage (removendo arquivos antigos se necessário) 
+     * e atualiza o status do estudo e os dados da primeira série relacionada.
+     *
+     * @param  \App\Http\Requests\LaudoRequest  $request Objeto de requisição contendo:
+     * - status: string (pendente, laudado, rejeitado)
+     * - laudo_pdf: string (base64)
+     * - laudo_texto: string
+     * @param  int|string  $id ID único do estudo (Study).
+     * * @return \Illuminate\Http\JsonResponse Respostas possíveis:
+     * - 200: Sucesso ao salvar.
+     * - 404: Estudo não encontrado.
+     * - 422: Erro de validação ou PDF inválido.
+     * - 500: Erro interno de processamento ou storage.
+     * * @throws \Throwable Captura e loga falhas durante o upload ou atualização do banco.
+     */
     public function setLaudo(LaudoRequest $request, $id){
         $exame = Study::find($id);
 
@@ -247,6 +266,9 @@ class ExameController extends Controller
                 'error' => 'Erro interno ao salvar laudo'
             ], 500);
         }
+    }
+
+    public function setRejeicao(Request $request){
 
     }
 
