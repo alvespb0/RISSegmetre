@@ -151,6 +151,31 @@ class MedicoController extends Controller
         ], 200);
     }
 
+    public function restore(Request $request, string $id)
+    {
+        $empresa = $this->getEmpresa($request->header('Authorization'));
+        $medico = MedicoLaudo::where('id', $id)
+            ->where('empresas_laudo_id', $empresa->id)
+            ->withTrashed()
+            ->first();
+
+        if (!$medico) {
+            return response()->json([
+                'status' => false,
+                'error' => 'Médico não encontrado ou não pertence à empresa.'
+            ], 404);
+        }
+
+        $medico->restore();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Medico reativado com sucesso'
+        ], 200);
+
+    }
+    
+
     private function getEmpresa($authHeader){
         $token = substr($authHeader, 7);
         

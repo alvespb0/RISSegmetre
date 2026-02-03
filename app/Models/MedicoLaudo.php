@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class MedicoLaudo extends Model
 {
@@ -12,6 +14,7 @@ class MedicoLaudo extends Model
 
     use HasFactory;
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'empresas_laudo_id',
@@ -20,6 +23,15 @@ class MedicoLaudo extends Model
         'conselho_classe',
         'signature_path',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty() 
+            ->dontSubmitEmptyLogs()
+            ->useLogName('medico'); // Nome da "gaveta" no log
+    }
 
     public function empresa(){
         return $this->belongsTo(EmpresaLaudo::class, 'empresas_laudo_id');

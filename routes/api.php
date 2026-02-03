@@ -24,8 +24,12 @@ Route::middleware('apiBearer')->get('/exames', [ExameController::class, 'index']
 Route::middleware('apiBearer')->get('/exames/{id}', [ExameController::class, 'show'])->name('api.show-exame');
 Route::middleware('apiBearer')->get('/exames/download-image/{instance_uuid}', [ExameController::class, 'downloadDicom'])->name('api.download-dicom');
 Route::middleware('apiBearer')->post('/exames/laudar/{id}', [ExameController::class, 'setLaudo'])->name('api.set-laudo');
-Route::middleware('apiBearer')->post('/medico/cadastrar', [MedicoController::class, 'store'])->name('api.store-medico');
-Route::middleware('apiBearer')->get('/medico', [MedicoController::class, 'index'])->name('api.show.all-medico');
-Route::middleware('apiBearer')->get('/medico/{id}', [MedicoController::class, 'show'])->name('api.show-medico');
-Route::middleware('apiBearer')->put('/medico/update/{id}', [MedicoController::class, 'update'])->name('api.update-medico');
-Route::middleware('apiBearer')->get('/medico/delete/{id}', [MedicoController::class, 'destroy'])->name('api.delete-medico');
+
+Route::middleware('apiBearer')->controller(MedicoController::class)->group(function(){
+    Route::get('/medico', 'index')->name('api.show.all-medico');
+    Route::get('/medico/{id}', 'show')->name('api.show-medico');
+    Route::post('/medico/cadastrar', 'store')->name('api.store-medico');
+    Route::put('/medico/update/{id}', 'update')->name('api.update-medico');
+    Route::get('/medico/delete/{id}', 'destroy')->name('api.delete-medico');
+    Route::get('/medico/restore/{id}', 'restore')->name('api.restore-medico');
+});
