@@ -27,3 +27,5 @@ Route::middleware('apiBearer')->post('/exames/laudar/{id}', [ExameController::cl
 Route::middleware('apiBearer')->post('/medico/cadastrar', [MedicoController::class, 'store'])->name('api.store-medico');
 Route::middleware('apiBearer')->get('/medico', [MedicoController::class, 'index'])->name('api.show.all-medico');
 Route::middleware('apiBearer')->get('/medico/{id}', [MedicoController::class, 'show'])->name('api.show-medico');
+Route::middleware('apiBearer')->put('/medico/update/{id}', [MedicoController::class, 'update'])->name('api.update-medico');
+Route::middleware('apiBearer')->get('/medico/delete/{id}', [MedicoController::class, 'destroy'])->name('api.delete-medico');
