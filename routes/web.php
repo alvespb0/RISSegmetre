@@ -5,6 +5,7 @@ use App\Http\Controllers\ExameController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\IntegracaoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,6 +41,16 @@ Route::middleware(['checkUserType:dev'])->controller(ApiController::class)->grou
     Route::get('/dev/api-tokens', 'show')->name('dev.api-tokens');
     Route::post('/dev/api-tokens', 'store')->name('dev.api-tokens.store');
     Route::post('/dev/api-tokens/{id}/toggle', 'toggleActive')->name('dev.api-tokens.toggle');
+});
+
+Route::middleware(['checkUserType:dev'])->controller(IntegracaoController::class)->group(function () {
+    Route::get('/dev/integracoes', 'index')->name('dev.integracoes.index');
+    Route::get('/dev/integracoes/create', 'create')->name('dev.integracoes.create');
+    Route::post('/dev/integracoes', 'store')->name('dev.integracoes.store');
+    Route::get('/dev/integracoes/{integracao}/edit', 'edit')->name('dev.integracoes.edit');
+    Route::put('/dev/integracoes/{integracao}', 'update')->name('dev.integracoes.update');
+    Route::delete('/dev/integracoes/{integracao}', 'destroy')->name('dev.integracoes.destroy');
+    Route::post('/dev/integracoes/{id}/restore', 'restore')->name('dev.integracoes.restore');
 });
 
 Route::middleware(['checkUserType:admin,dev,tecnico,medico'])->controller(ExameController::class)->group(function (){
