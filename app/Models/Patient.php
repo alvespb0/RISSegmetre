@@ -15,6 +15,7 @@ class Patient extends Model
         'nome',
         'patient_external_id',
         'birth_date',
+        'patient_cpf',
         'sexo' # enum
     ];
 

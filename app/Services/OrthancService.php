@@ -35,7 +35,6 @@ class OrthancService
                 return false;
             }
             $data = $response->json();
-
             \Log::info(
                 'Preparando para salvar DICOMs meta no banco',
                 ['data' => $data]
@@ -53,6 +52,7 @@ class OrthancService
                     [
                         'nome' => $patientName,
                         'birth_date' => $birthDate,
+                        'patient_cpf' => $d['PatientMainDicomTags']['PatientID'],
                         'sexo' => $d['PatientMainDicomTags']['PatientSex'],
                     ]
                 );
