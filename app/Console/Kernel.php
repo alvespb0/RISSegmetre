@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->job(new OrthancSyncJob)->everyFiveMinutes();
+        $schedule->job(new EmpresasSocJob)->dailyAt('03:00');
     }
 
     /**

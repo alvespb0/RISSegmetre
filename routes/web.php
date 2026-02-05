@@ -23,18 +23,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['checkUserType:admin,dev,medico,tecnico'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/', [ExameController::class, 'index'])->name('exames.index');
-    Route::get('/pacientes', function () {
-        return view('pacientes.index');
-    })->name('pacientes.index');
-    Route::get('/relatorios', function () {
-        return view('relatorios.index');
-    })->name('relatorios.index');
-    Route::get('/usuarios', function () {
-        return view('usuarios.index');
-    })->name('usuarios.index');
-    Route::get('/configuracoes', function () {
-        return view('configuracoes.index');
-    })->name('configuracoes.index');
+    Route::get('/pacientes', function () { return view('pacientes.index'); })->name('pacientes.index');
+    Route::get('/relatorios', function () { return view('relatorios.index'); })->name('relatorios.index');
+    Route::get('/usuarios', function () { return view('usuarios.index'); })->name('usuarios.index');
+    Route::get('/configuracoes', function () { return view('configuracoes.index'); })->name('configuracoes.index');
 });
 
 Route::middleware(['checkUserType:dev'])->controller(ApiController::class)->group(function () {
