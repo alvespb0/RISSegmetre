@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Models\EmpresasSoc;
 use App\Models\Integracao;
+use App\Models\Study;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 
@@ -82,5 +83,117 @@ class EmpresasSocService
         
         // Converte para UTF-8
         return mb_convert_encoding($string, 'UTF-8', $encoding ?: 'ISO-8859-1');
+    }
+
+    /**
+     * Consulta o SOC para resgatar o código sequencial da ficha
+     * relacionado ao estudo informado.
+     *
+     * O método monta os parâmetros necessários para a integração externa,
+     * realiza a chamada HTTP ao endpoint configurado e retorna o código
+     * sequencial encontrado.
+     *
+     * Fluxo:
+     * - Calcula o período de busca baseado na data do estudo
+     * - Monta payload de integração
+     * - Realiza requisição HTTP ao SOC
+     * - Converte resposta para UTF-8
+     * - Extrai o código sequencial retornado
+     *
+     * Em caso de falha (HTTP, resposta vazia ou exceção),
+     * retorna status=false com mensagem descritiva.
+     *
+     * @param string|int $codEmpresa Código da empresa no SOC.
+     * @param Study $study Instância do estudo contendo dados do paciente e data do exame.
+     *
+     * @return array{
+     *     status: bool,
+     *     codSequencial?: string,
+     *     message: string
+     * }
+     *
+     * @throws \Exception Exceções internas são capturadas e logadas,
+     * mas não propagadas para fora do método.
+     */
+    public function getCodSequencial($codEmpresa, Study $study): array{
+        $integracao = Integracao::where('slug', 'ws_soc_resgata_cod_ficha')->first();
+
+        $codPrestador = ENV('COD_PRESTADOR_SOC');
+
+        $dataEstudo = Carbon::parse($study->study_date);
+
+        $dataFim = $dataEstudo->format('d/m/Y');
+        $dataInicio = $dataEstudo->copy()->subWeek()->format('d/m/Y');
+
+        try{
+            $parametro = [
+                "empresa" => $codEmpresa,
+                "codigo" => "212068",
+                "chave" => $integracao->getDecryptedPassword(),
+                "tipoSaida" => "json",
+                "funcionarioInicio" => "0",
+                "funcionarioFim" => "99999",
+                "paramData" => "1",
+                "dataInicio" => $dataInicio,
+                "dataFim" => $dataFim,
+                "paramFunc" => "1",
+                "cpffuncionario" => $study->patient->patient_cpf,
+                "codpresta" => $codPrestador,
+                "paramPresta" => "1"
+            ];
+
+            $json = json_encode($parametro, JSON_UNESCAPED_SLASHES);
+
+            \Log::info('Preparando para resgatar o codigo sequencial da ficha.',[
+                'study' => $study->id,
+                'query_string' => $json
+            ]);
+
+            $response = Http::get($integracao->endpoint, [
+                'parametro' => $json
+            ]);
+
+            if($response->ok()){
+                $body = $response->body();
+
+                $bodyUtf8 = $this->convertToUtf8($body);
+
+                $dados = json_decode($bodyUtf8, true);
+                
+                var_dump($dados);
+
+                if(empty($dados)){
+                    \Log::error('Não localizado codigo sequencial para query string informada');
+                    return [
+                        'status' => false,
+                        'message' => 'Não localizado codigo sequencial para query string informada'
+                    ];
+                }
+
+                \Log::info('Finalizado Busca por código sequencial');
+
+                return [
+                    'status' => true,
+                    'codSequencial' => $dados[0]['SEQUENCIAFICHA'],
+                    'message' => 'Registro SOC vinculado com sucesso'
+                ];
+            }else{
+                \Log::error('Erro HTTP SOC', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+
+                return [
+                    'status' => false,
+                    'message' => 'Erro na comunicação com o SOC'
+                ];
+            }
+        }catch (\Exception $e) {
+            \Log::error(['erro' => $e->getMessage()]);
+            return [
+                'status' => false,
+                'message' => 'Erro ao vincular registro SOC',
+            ];
+        }
     }
 }

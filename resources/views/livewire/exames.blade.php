@@ -1,7 +1,7 @@
 <div>
     <div class="p-6" x-data="{ 
         isMedico: {{ Auth::user()->tipo === 'medico' ? 'true' : 'false' }},
-
+        openSocModal: null
     }">
         <div class="mb-6">
             <h2 class="text-2xl font-semibold text-foreground mb-2">Lista de Exames</h2>
@@ -78,7 +78,7 @@
             <th class="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Data do Estudo</th>
             <th class="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Médico Solicitante</th>
             <th class="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Status</th>
-            <th class="px-6 py-4 text-left text-sm font-medium text-muted-foreground">Ações</th>
+            <th class="px-6 py-4 text-center text-sm font-medium text-muted-foreground">Ações</th>
         </tr>
     </thead>
     <tbody>
@@ -105,16 +105,28 @@
                     </span>
                 </td>
 
-                <td class="px-6 py-4">
-                    <button
-                        wire:click="toggleStudy({{ $study->id }})"
-                        class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/10 rounded-lg transition-colors"
-                    >
-                        <svg class="w-4 h-4 transition-transform {{ ($openStudies[$study->id] ?? false) ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                        {{ ($openStudies[$study->id] ?? false) ? 'Ocultar Séries' : 'Expandir Séries' }}
-                    </button>
+                <td class="px-6 py-4 text-center">
+                    <div class="flex flex-wrap items-center justify-center gap-2">
+                        <button
+                            wire:click="toggleStudy({{ $study->id }})"
+                            class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                        >
+                            <svg class="w-4 h-4 transition-transform {{ ($openStudies[$study->id] ?? false) ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                            {{ ($openStudies[$study->id] ?? false) ? 'Ocultar Séries' : 'Expandir Séries' }}
+                        </button>
+                        <button
+                            type="button"
+                            @click="openSocModal = {{ $study->id }}"
+                            class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                            </svg>
+                            Vincular SOC
+                        </button>
+                    </div>
                 </td>
             </tr>
 
@@ -145,6 +157,51 @@
                     <p class="text-muted-foreground text-sm mt-2">Tente alterar o filtro ou verifique novamente mais tarde.</p>
                 </div>
             @endif
+        </div>
+
+        {{-- Modal Vincular Registro SOC --}}
+        <div
+            x-show="openSocModal !== null"
+            x-cloak
+            x-on:keydown.escape.window="openSocModal = null"
+            class="fixed inset-0 z-50 overflow-y-auto px-4"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+        >
+            <div class="fixed inset-0 bg-black/50" @click="openSocModal = null"></div>
+            <div class="relative min-h-[200px] flex items-center justify-center p-4">
+                <div
+                    class="relative w-full max-w-4xl bg-card border border-border rounded-lg shadow-xl"
+                    @click.stop
+                    x-transition:enter="ease-out duration-300"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100"
+                >
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-border">
+                        <h3 class="text-lg font-semibold text-foreground">Vincular Registro SOC</h3>
+                        <button
+                            type="button"
+                            @click="openSocModal = null"
+                            class="p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-6 max-h-[70vh] overflow-y-auto">
+                        @foreach($studies as $study)
+                            <div x-show="openSocModal == {{ $study->id }}" x-cloak>
+                                <livewire:empresas-soc-list :study="$study" :key="'soc-list-'.$study->id" />
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
         </div>
 
         @if($studies->hasPages())
