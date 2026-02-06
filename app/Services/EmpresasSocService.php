@@ -160,8 +160,6 @@ class EmpresasSocService
 
                 $dados = json_decode($bodyUtf8, true);
                 
-                var_dump($dados);
-
                 if(empty($dados)){
                     \Log::error('Não localizado codigo sequencial para query string informada');
                     return [

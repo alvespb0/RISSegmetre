@@ -16,7 +16,18 @@ class Exames extends Component
     public $filtroPaciente = '';
     public $filtroStudyDate;
     public array $openStudies = [];
+    public $selectedStudyId = null;
 
+    public function selectStudy($id)
+    {
+        $this->selectedStudyId = $id;
+        $this->dispatch('open-modal-soc');
+    }
+
+    public function clearSelection()
+    {
+        $this->selectedStudyId = null;
+    }
     
     /**
      * Define o filtro de status usado para listar exames/instâncias e reseta a paginação.

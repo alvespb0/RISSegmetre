@@ -10,7 +10,7 @@ use App\Services\EmpresasSocService;
 
 class EmpresasSocList extends Component
 {
-    public Study $study;
+    public $study;
     public $empresas;
     public $search = '';
 
@@ -19,7 +19,9 @@ class EmpresasSocList extends Component
         $this->study = $study;
     }
 
-    public function getCodigoSeq($idEmpresa, EmpresasSocService $service){
+    public function getCodigoSeq($idEmpresa){
+        $service = new EmpresasSocService;
+    
         $return = $service->getCodSequencial($idEmpresa, $this->study);
 
         if($return['status'] !== true){
@@ -28,10 +30,8 @@ class EmpresasSocList extends Component
         }
 
         $this->study->update([
-            'codigo_sequencial_ficha' => $return['codSequencial']
+            'cod_sequencial_ficha' => $return['codSequencial']
         ]);
-
-        /* if($study->status == 'laudado') */ # Disparar para salvar laudo soc
 
         $this->dispatch('toast-success', message: $return['message']);
     }
