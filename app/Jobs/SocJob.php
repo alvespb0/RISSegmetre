@@ -43,7 +43,13 @@ class SocJob implements ShouldQueue
         ]);
 
         foreach($studies as $study){
-            $service->uploadFromStudy($study->id);
+            $retorno = $service->uploadFromStudy($study->id);
+
+            if($retorno == true){
+                $study->update([
+                    'enviado_soc' => true
+                ]);
+            }
         }
     }
 }

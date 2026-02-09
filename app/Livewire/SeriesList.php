@@ -53,14 +53,14 @@ class SeriesList extends Component
 
             $file = $service->gerarLaudo($this->serie, $this->laudo, $medico);
 
-            if(!empty($this->serie->study->laudo)){
-                $this->serie->study->laudo()->update([
+            if(!empty($this->serie->laudo)){
+                $this->serie->laudo()->update([
                     'ativo' => false
                 ]);
             }
 
             Laudo::create([
-                'study_id' => $this->serie->study->id,
+                'serie_id' => $this->serie->id,
                 'medico_id' => $medico->id,
                 'laudo' => $this->laudo,
                 'laudo_path' => $file['pdf'],
@@ -139,7 +139,7 @@ class SeriesList extends Component
      * @return void
      */
     public function baixarLaudo(){
-        $idEnc = Crypt::encryptString($this->serie->study->id);
+        $idEnc = Crypt::encryptString($this->serie->id);
 
         activity('downloads')
                 ->performedOn($this->serie)

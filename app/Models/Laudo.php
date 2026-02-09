@@ -17,7 +17,7 @@ class Laudo extends Model
     use LogsActivity;
 
     protected $fillable = [
-        'study_id',
+        'serie_id',
         'empresa_id',
         'medico_id',
         'laudo', #texto
@@ -35,8 +35,8 @@ class Laudo extends Model
             ->useLogName('laudo'); // Nome da "gaveta" no log
     }
 
-    public function study(){
-        return $this->belongsTo(Study::class, 'study_id');
+    public function serie(){
+        return $this->belongsTo(Serie::class, 'serie_id');
     }
 
     public function empresa(){

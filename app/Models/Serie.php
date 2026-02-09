@@ -43,4 +43,9 @@ class Serie extends Model
     public function protocolo(){
         return $this->hasOne(DeliveryProtocol::class, 'laudo_id');
     }
+    
+    public function laudo(){
+        return $this->hasMany(Laudo::class, 'serie_id');
+    }
+
 }

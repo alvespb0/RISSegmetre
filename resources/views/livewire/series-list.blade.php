@@ -53,9 +53,9 @@
                                     @click="modalLaudoOpen = true"
                                 >
                                     @if(Auth::user()->tipo == 'medico')
-                                        {{ $serie->study->laudo ? 'Editar Laudo' : 'Digitar Laudo'}}
+                                        {{ $serie->laudo()->exists() ? 'Editar Laudo' : 'Digitar Laudo'}}
                                     @else
-                                        {{ $serie->study->laudo ? 'Ver Laudo' : 'Sem Laudo'}}
+                                        {{ $serie->laudo()->exists() ? 'Ver Laudo' : 'Sem Laudo'}}
                                     @endif
                                 </button>
                             @endif
@@ -94,7 +94,7 @@
                                         Baixando...
                                     </span>
                                 </button>
-                            @elseif(($serie->study->status == 'laudado' && !$serie->protocolo()->exists()) && Auth::user()->tipo != 'medico')
+                            @elseif(($serie->laudo()->exists() && !$serie->protocolo()->exists()) && Auth::user()->tipo != 'medico')
                                 <button
                                     type="button"
                                     wire:click="gerarProtocolo"
@@ -113,7 +113,7 @@
                                 </button>
                             @endif
                             {{-- Botão Download --}}
-                            @if($serie->study->status == 'laudado')
+                            @if($serie->laudo()->exists())
                                 <button
                                     type="button"
                                     wire:click="baixarLaudo"
@@ -295,7 +295,7 @@
                         
                         {{-- Modo Visualização (Para quem não é médico) --}}
                         <div x-show="!isMedico" class="w-full px-4 py-3 bg-muted/20 border border-border rounded-lg min-h-[300px] overflow-y-auto italic text-muted-foreground">
-                            {{ $serie->study->laudo()->where('ativo', true)->first()->laudo ?? 'O laudo ainda não foi emitido pelo médico responsável.' }}
+                            {{ $serie->laudo()->where('ativo', true)->first()->laudo ?? 'O laudo ainda não foi emitido pelo médico responsável.' }}
                         </div>
 
                         {{-- Modo Edição (Apenas para Médicos) --}}

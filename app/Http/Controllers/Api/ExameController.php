@@ -107,6 +107,7 @@ class ExameController extends Controller
 
         foreach($study->serie as $serie){
             $series[] = [
+                'id' => $serie->id,
                 'uuid' => Crypt::encryptString($serie->serie_external_id),
                 'modality' => $serie->modality,
                 'body_part_examined' => $serie->body_part_examined,
@@ -213,16 +214,16 @@ class ExameController extends Controller
      * * @throws \Throwable Captura e loga falhas durante o upload ou atualização do banco.
      */
     public function setLaudo(LaudoRequest $request, $id){
-        $exame = Study::find($id);
+        $serie = Serie::find($id);
 
-        if(!$exame){
+        if(!$serie){
             return response()->json([
                 'error' => 'Estudo não encontrado',
                 'id' => $id
             ], 404);
         }
 
-        $exame->first();
+        $serie->first();
 
         $pdfBin = base64_decode($request->laudo_pdf, true);
 
@@ -242,12 +243,8 @@ class ExameController extends Controller
         $filePath = 'laudos/'.$fileName;
 
         try{
-            if (!empty($exame->serie->first()->laudo_path)) {
-                Storage::delete($exame->serie->first()->laudo_path);
-            }
-
-            if(!empty($exame->laudo)){
-                $exame->laudo()->update([
+            if(!empty($serie->laudo)){
+                $serie->laudo()->update([
                     'ativo' => false
                 ]);
             }
@@ -263,12 +260,12 @@ class ExameController extends Controller
 
             $medico = MedicoLaudo::findOrFail($request->medico_id);
 
-            $exame->update([
+            $serie->study->update([
                 'status' => $request->status
             ]);
 
             Laudo::create([
-                'study_id' => $exame->id,
+                'serie_id' => $serie->id,
                 'medico_id' => $request->medico_id,
                 'empresa_id' => $medico->empresa->id ?? null,
                 'laudo' => $request->laudo_texto,

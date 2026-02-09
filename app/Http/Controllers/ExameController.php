@@ -50,9 +50,9 @@ class ExameController extends Controller
     public function getLaudoFile($idEnc){
         $id = Crypt::decryptString($idEnc);
 
-        $exame = Study::findOrFail($id);
+        $serie = Serie::findOrFail($id);
 
-        $path = $exame->laudo()->where('ativo', true)->first()?->laudo_path;
+        $path = $serie->laudo()->where('ativo', true)->first()?->laudo_path;
 
         if (!Storage::exists($path)) {
             \Log::error("Erro ao baixar laudo da serie: {$id}, path inexistente");

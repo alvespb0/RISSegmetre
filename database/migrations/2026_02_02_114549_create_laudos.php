@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('laudos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('study_id');
+            $table->unsignedBigInteger('serie_id');
             $table->unsignedBigInteger('empresa_id')->nullable(); # se não for laudado externamente, não vai receber empresa_id
             $table->unsignedBigInteger('medico_id');
             $table->text('laudo')->nullable();
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean('laudo_assinado')->default(false);
             $table->boolean('ativo')->default(true);
             $table->softDeletes();
-            $table->foreign('study_id')->references('id')->on('studies')->onDelete('cascade');
+            $table->foreign('serie_id')->references('id')->on('series')->onDelete('cascade');
             $table->foreign('empresa_id')->references('id')->on('empresas_laudo')->onDelete('cascade');
             $table->foreign('medico_id')->references('id')->on('medicos_laudo')->onDelete('cascade');
             $table->timestamps();

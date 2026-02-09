@@ -31,8 +31,7 @@ class PatientController extends Controller
 
         $modelProtocol = DeliveryProtocol::where('protocolo', $protocolo)->firstOrFail();
 
-        $path = $modelProtocol->serie->study
-                            ->laudo()
+        $path = $modelProtocol->serie->laudo()
                             ->where('ativo', true)
                             ->first()
                             ->laudo_path;
