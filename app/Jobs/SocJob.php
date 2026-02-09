@@ -8,7 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-use App\Models\Study;
+use App\Models\Serie;
 use App\Services\UploadLaudoSocService;
 
 class SocJob implements ShouldQueue
@@ -28,25 +28,27 @@ class SocJob implements ShouldQueue
      */
     public function handle(UploadLaudoSocService $service): void
     {
-        $studies = Study::whereHas('laudo', function ($q) {
+        $series = Serie::whereHas('laudo', function ($q) {
                             $q->where('ativo', true);
                         })
-                        ->where('status', 'laudado')
-                        ->whereNotNull('cod_sequencial_ficha')
+                        ->whereHas('study', function ($q) {
+                            $q->where('status', 'laudado')
+                            ->whereNotNull('cod_sequencial_ficha');
+                        })
                         ->where('enviado_soc', false)
                         ->get();
 
                         
         \Log::info('SOC Job iniciou processamento', [
-            'total' => $studies->count(),
-            'studies' => $studies->pluck('id'),
+            'total' => $series->count(),
+            'studies' => $series->pluck('id'),
         ]);
 
-        foreach($studies as $study){
-            $retorno = $service->uploadFromStudy($study->id);
+        foreach($series as $serie){
+            $retorno = $service->uploadFromSerie($serie->id);
 
             if($retorno == true){
-                $study->update([
+                $serie->update([
                     'enviado_soc' => true
                 ]);
             }

@@ -69,6 +69,8 @@ class SeriesList extends Component
             $this->serie->study->update([
                 'status' => 'laudado'
             ]);
+            
+            dispatch(new \App\Jobs\SocJob());
 
             $this->dispatch('toast-success', message: 'Laudo gerado com sucesso!');
             $this->dispatch('close-modal-laudo-' . $this->serie->id);

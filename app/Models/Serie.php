@@ -20,7 +20,8 @@ class Serie extends Model
         'medico_id',
         'modality', #enum
         'motivo_rejeicao',
-        'body_part_examined'
+        'body_part_examined',
+        'enviado_soc'
     ];
 
     public function getActivitylogOptions(): LogOptions

@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 
 use App\Models\Integracao;
-use App\Models\Study;
+use App\Models\Serie;
 
 class UploadLaudoSocService
 {
@@ -234,18 +234,18 @@ class UploadLaudoSocService
         ];
     }
 
-    public function uploadFromStudy($studyId){
+    public function uploadFromSerie($serieId){
         try {
 
-            $study = Study::findOrFail($studyId);
+            $serie = Serie::findOrFail($serieId);
 
-            $laudo = $study->laudo()
+            $laudo = $serie->laudo()
                 ->where('ativo', true)
                 ->first();
 
             if (!$laudo || !$laudo->laudo_path) {
                 \Log::warning('SOC upload abortado: laudo não encontrado', [
-                    'study_id' => $studyId
+                    'serie_id' => $serieId
                 ]);
                 return false;
             }
@@ -260,7 +260,7 @@ class UploadLaudoSocService
             $service = new self(
                 $integracao->username,
                 $integracao->getDecryptedPassword(),
-                $study->cod_sequencial_ficha,
+                $serie->study->cod_sequencial_ficha,
                 $laudo->laudo_path
             );
 
@@ -268,20 +268,19 @@ class UploadLaudoSocService
 
             if ($success) {
 
-                $study->update([
+                $serie->update([
                     'enviado_soc' => true,
-                    'enviado_soc_em' => now(),
                 ]);
 
                 \Log::info('Upload SOC realizado com sucesso', [
-                    'study_id' => $studyId
+                    'serie_id' => $serieId
                 ]);
 
                 return true;
             }
 
             \Log::warning('SOC upload retornou falso', [
-                'study_id' => $studyId
+                'serie_id' => $serieId
             ]);
 
             return false;
@@ -289,7 +288,7 @@ class UploadLaudoSocService
         } catch (\Throwable $e) {
 
             \Log::error('Erro no upload SOC', [
-                'study_id' => $studyId,
+                'serie_id' => $serieId,
                 'erro' => $e->getMessage()
             ]);
 

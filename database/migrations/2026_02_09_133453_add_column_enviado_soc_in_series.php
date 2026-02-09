@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('studies', function (Blueprint $table) {
+        Schema::table('series', function (Blueprint $table) {
             $table->boolean('enviado_soc')->default(false);
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('studies', function (Blueprint $table) {
+        Schema::table('series', function (Blueprint $table) {
             //
         });
     }

@@ -272,6 +272,8 @@ class ExameController extends Controller
                 'laudo_path' => $filePath,
             ]);
 
+            dispatch(new \App\Jobs\SocJob());
+
             return response()->json([
                 'message' => 'Laudo salvo com sucesso'
             ], 200);
