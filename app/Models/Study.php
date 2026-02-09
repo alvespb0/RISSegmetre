@@ -22,6 +22,7 @@ class Study extends Model
         'status', # enum
         'study_date',
         'cod_sequencial_ficha',
+        'enviado_soc'
     ];
 
     public function getActivitylogOptions(): LogOptions

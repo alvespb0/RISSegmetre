@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 
 use App\Models\Integracao;
+use App\Models\Study;
 
 class UploadLaudoSocService
 {
@@ -25,7 +26,7 @@ class UploadLaudoSocService
      * @param int $codSequencial Resgatado no inicio do fluxo
      * @param string $laudo_path path para resgatar o arquivo a ser feito o upload no SOC
      */
-    public function __construct($username, $password, $codSequencial, $laudo_path){
+    public function __construct($username = null, $password = null, $codSequencial = null, $laudo_path = null){
         $this->username = $username;
         $this->password = $password;
         $this->codSequencial = $codSequencial;
@@ -64,8 +65,6 @@ class UploadLaudoSocService
                 ],
             ],
         ], $boundary);
-
-        \Log::info('Iniciando requisição para fazer upload do laudo', ['xml' => $xml, 'multipart' => $multipart]);
         
         $client = new \GuzzleHttp\Client([
             'verify' => false,
@@ -197,7 +196,7 @@ class UploadLaudoSocService
      *               - 'created': Timestamp de criação (formato ISO 8601 com milissegundos)
      *               - 'expires': Timestamp de expiração (formato ISO 8601 com milissegundos)
      */
-    private function buildWSS(int $ttlSeconds = 60): array
+    private function buildWSS(int $ttlSeconds = 100): array
     {
         // 1. NONCE
         // O padrão exige que geremos bytes aleatórios.
@@ -233,6 +232,69 @@ class UploadLaudoSocService
             'created'  => $created,
             'expires'  => $expires,
         ];
+    }
+
+    public function uploadFromStudy($studyId){
+        try {
+
+            $study = Study::findOrFail($studyId);
+
+            $laudo = $study->laudo()
+                ->where('ativo', true)
+                ->first();
+
+            if (!$laudo || !$laudo->laudo_path) {
+                \Log::warning('SOC upload abortado: laudo não encontrado', [
+                    'study_id' => $studyId
+                ]);
+                return false;
+            }
+
+            $integracao = Integracao::where('slug', 'ws_soc_upload_ged')->first();
+
+            if (!$integracao) {
+                \Log::error('Integração SOC não configurada');
+                return false;
+            }
+
+            $service = new self(
+                $integracao->username,
+                $integracao->getDecryptedPassword(),
+                $study->cod_sequencial_ficha,
+                $laudo->laudo_path
+            );
+
+            $success = $service->requestUpload();
+
+            if ($success) {
+
+                $study->update([
+                    'enviado_soc' => true,
+                    'enviado_soc_em' => now(),
+                ]);
+
+                \Log::info('Upload SOC realizado com sucesso', [
+                    'study_id' => $studyId
+                ]);
+
+                return true;
+            }
+
+            \Log::warning('SOC upload retornou falso', [
+                'study_id' => $studyId
+            ]);
+
+            return false;
+
+        } catch (\Throwable $e) {
+
+            \Log::error('Erro no upload SOC', [
+                'study_id' => $studyId,
+                'erro' => $e->getMessage()
+            ]);
+
+            return false;
+        }
     }
 
 }
