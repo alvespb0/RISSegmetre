@@ -21,7 +21,8 @@ class Serie extends Model
         'modality', #enum
         'motivo_rejeicao',
         'body_part_examined',
-        'enviado_soc'
+        'enviado_soc',
+        'status',
     ];
 
     public function getActivitylogOptions(): LogOptions

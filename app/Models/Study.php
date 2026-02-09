@@ -39,4 +39,25 @@ class Study extends Model
     public function serie(){
         return $this->hasMany(Serie::class, 'study_id');
     }
+
+    public function recalculateStatus(){
+        $series = $this->serie()->get();
+
+        $total = $series->count();
+        $laudadas = $series->where('status', 'laudado')->count();
+        $rejeitadas = $series->where('status', 'rejeitado')->count();
+
+        if ($rejeitadas === $total) {
+            $status = 'rejeitado';
+        } elseif ($laudadas === $total) {
+            $status = 'laudado';
+        } elseif ($laudadas > 0 || $rejeitadas > 0) {
+            $status = 'andamento';
+        } else {
+            $status = 'pendente';
+        }
+
+        $this->updateQuietly(['status' => $status]);
+    }
+
 }

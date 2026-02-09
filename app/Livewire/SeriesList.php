@@ -66,10 +66,12 @@ class SeriesList extends Component
                 'laudo_path' => $file['pdf'],
             ]);
 
-            $this->serie->study->update([
+            $this->serie->update([
                 'status' => 'laudado'
             ]);
-            
+
+            $this->serie->study->recalculateStatus();
+
             dispatch(new \App\Jobs\SocJob());
 
             $this->dispatch('toast-success', message: 'Laudo gerado com sucesso!');
@@ -120,12 +122,11 @@ class SeriesList extends Component
     public function setRejeicao(){
         try{
             $this->serie->update([
-                'motivo_rejeicao' => $this->rejeicao
-            ]);
-            
-            $this->serie->study->update([
+                'motivo_rejeicao' => $this->rejeicao,
                 'status' => 'rejeitado'
             ]);
+            
+            $this->serie->study->recalculateStatus();
 
             $this->dispatch('toast-success', message: 'Exame rejeitado!');
             $this->dispatch('close-modal-rejeicao-' . $this->serie->id);

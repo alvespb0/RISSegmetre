@@ -260,9 +260,11 @@ class ExameController extends Controller
 
             $medico = MedicoLaudo::findOrFail($request->medico_id);
 
-            $serie->study->update([
+            $serie->update([
                 'status' => $request->status
             ]);
+
+            $serie->study->recalculateStatus();
 
             Laudo::create([
                 'serie_id' => $serie->id,
@@ -321,8 +323,29 @@ class ExameController extends Controller
         return true;
     }
 
-    public function setRejeicao(Request $request){
+    public function setRejeicao(Request $request, $id){
+        $validated = $request->validate([
+            'motivo_rejeicao' => 'required|string|max:255',
+        ]);
 
+        $serie = Serie::find($id);
+
+        if(!$serie){
+            return response()->json([
+                'serie não encontrado com o id: '. $id
+            ], 404);
+        }
+
+        $serie->update([
+            'motivo_rejeicao' => $request->motivo_rejeicao,
+            'status' => 'rejeitado'
+        ]);
+
+        $serie->study->recalculateStatus();
+
+        return response()->json([
+            'message' => 'Rejeicao salva com sucesso'
+        ], 200);
     }
 
     /**
