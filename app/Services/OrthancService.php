@@ -26,7 +26,7 @@ class OrthancService
         $endPoint = env('ORTHANC_SERVER').'/studies';
 
         try{
-            $response = Http::get($endPoint, [
+            $response = Http::withBasicAuth(env('ORTHANC_USER'), env('ORTHANC_PASS'))->get($endPoint, [
                 'expand' => ''
             ]);
 
@@ -99,7 +99,7 @@ class OrthancService
         $endPoint = env('ORTHANC_SERVER').'/series'.'/'.$serieId;
 
         try{
-            $response = Http::get($endPoint, [
+            $response = Http::withBasicAuth(env('ORTHANC_USER'), env('ORTHANC_PASS'))->get($endPoint, [
                 'expand' => ''
             ]);
 
@@ -138,7 +138,7 @@ class OrthancService
         $endPoint = env('ORTHANC_SERVER').'/instances'.'/'.$instanceId;
 
         try{
-            $response = Http::get($endPoint, [
+            $response = Http::withBasicAuth(env('ORTHANC_USER'), env('ORTHANC_PASS'))->get($endPoint, [
                 'expand' => ''
             ]);
 

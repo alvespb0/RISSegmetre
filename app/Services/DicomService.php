@@ -14,7 +14,7 @@ class DicomService
         $endPoint = env('ORTHANC_SERVER').'/instances'.'/'.$id.'/file';
 
         try{
-            $response = Http::get($endPoint);
+            $response = Http::withBasicAuth(env('ORTHANC_USER'), env('ORTHANC_PASS'))->get($endPoint);
 
             if ($response->status() === 404) {
                 return null;

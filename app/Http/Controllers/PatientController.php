@@ -60,7 +60,7 @@ class PatientController extends Controller
         $endPoint = env('ORTHANC_SERVER').'/instances'.'/'.$id.'/rendered';
 
         try{
-            $response = Http::get($endPoint,[
+            $response = Http::withBasicAuth(env('ORTHANC_USER'), env('ORTHANC_PASS'))->get($endPoint,[
                 'use-dicom-windowing' => 'true',
                 'quality' => 95,
                 'smooth' => 1,

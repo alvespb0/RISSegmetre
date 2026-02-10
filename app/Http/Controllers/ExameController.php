@@ -27,7 +27,7 @@ class ExameController extends Controller
         $endPoint = env('ORTHANC_SERVER').'/instances'.'/'.$id.'/file';
 
         try{
-            $response = Http::get($endPoint);
+            $response = Http::withBasicAuth(env('ORTHANC_USER'), env('ORTHANC_PASS'))->get($endPoint);
 
             if(!$response->ok()){
                 \Log::error('Não localizado instância para endpoint informado.', ['endpoint' => $endPoint]);
