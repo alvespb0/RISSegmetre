@@ -73,16 +73,6 @@
 
                 <!-- Remember Me & Forgot Password -->
                 <div class="flex items-center justify-between">
-                    <label for="remember_me" class="inline-flex items-center cursor-pointer">
-                        <input 
-                            id="remember_me" 
-                            type="checkbox" 
-                            class="rounded border-border text-primary focus:ring-primary focus:ring-offset-0" 
-                            name="remember"
-                        >
-                        <span class="ms-2 text-sm text-foreground">{{ __('Lembrar-me') }}</span>
-                    </label>
-
                     @if (Route::has('password.request'))
                         <a 
                             class="text-sm text-primary hover:text-primary/80 font-medium transition-colors" 
@@ -142,19 +132,7 @@
                 </div>
             </form>
         </div>
-
-        @if (Route::has('register'))
-            <div class="mt-6 text-center">
-                <p class="text-sm text-muted-foreground">
-                    Não tem uma conta?
-                    <a href="{{ route('register') }}" class="text-primary hover:text-primary/80 font-medium transition-colors">
-                        {{ __('Criar conta') }}
-                    </a>
-                </p>
-            </div>
-        @endif
     </div>
-
     <style>
         [x-cloak] { display: none !important; }
     </style>
