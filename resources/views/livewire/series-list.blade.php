@@ -86,7 +86,7 @@
                                     @endif
                                 </button>
                             @endif
-                            @if(($serie->study->status == 'laudado' && $serie->protocolo()->exists()) && Auth::user()->tipo != 'medico')
+                            @if(($serie->status == 'laudado' && $serie->protocolo()->exists()) && Auth::user()->tipo != 'medico')
                                 <button
                                     type="button"
                                     wire:click="baixarProtocolo"
