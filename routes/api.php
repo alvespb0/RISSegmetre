@@ -24,6 +24,7 @@ Route::middleware('apiBearer')->get('/exames', [ExameController::class, 'index']
 Route::middleware('apiBearer')->get('/exames/{id}', [ExameController::class, 'show'])->name('api.show-exame');
 Route::middleware('apiBearer')->get('/exames/download-image/{instance_uuid}', [ExameController::class, 'downloadDicom'])->name('api.download-dicom');
 Route::middleware('apiBearer')->post('/exames/laudar/{id}', [ExameController::class, 'setLaudo'])->name('api.set-laudo');
+Route::middleware('apiBearer')->post('/exames/rejeitar/{id}', [ExameController::class, 'setRejeicao'])->name('api.rejeita-exame');
 
 Route::middleware('apiBearer')->controller(MedicoController::class)->group(function(){
     Route::get('/medico', 'index')->name('api.show.all-medico');

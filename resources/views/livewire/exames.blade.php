@@ -118,6 +118,7 @@
                             </svg>
                             {{ ($openStudies[$study->id] ?? false) ? 'Ocultar Séries' : 'Expandir Séries' }}
                         </button>
+                        @if(!$study->cod_sequencial_ficha)
                         <button
                             type="button"
                             wire:click="selectStudy({{ $study->id }})"
@@ -145,6 +146,29 @@
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
                         </button>
+                        @else
+                            <button
+                                type="button"
+                                disabled
+                                class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-semibold 
+                                    text-gray-500 bg-gray-100 border border-gray-200 
+                                    dark:text-gray-400 dark:bg-gray-800 dark:border-gray-700
+                                    rounded-lg cursor-not-allowed opacity-80"
+                            >
+                                <svg 
+                                    class="w-4 h-4" 
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101
+                                            m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                </svg>
+
+                                <span>SOC já vinculado</span>
+                            </button>
+                        @endif
                     </div>
                 </td>
             </tr>
