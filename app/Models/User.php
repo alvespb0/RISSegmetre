@@ -21,8 +21,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'tipo',
+        'medico_id'
     ];
 
+    public function medico(){
+        return $this->belongsTo(MedicoLaudo::class, 'medico_id');
+    }
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -41,5 +46,6 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'tipo' => 'string',
     ];
 }

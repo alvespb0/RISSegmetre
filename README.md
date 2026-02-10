@@ -1,66 +1,76 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SEGMETRE - Radiology Information System (RIS)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+O **SEGMETRE** é uma plataforma robusta de Gerenciamento de Informações Radiológicas (RIS) desenvolvida em **Laravel 10.x**. O sistema foi projetado para otimizar o fluxo de trabalho em clínicas de radiologia, desde a captura de imagens DICOM até a entrega de laudos assinados e integração com sistemas de Saúde Ocupacional.
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Tecnologias Principais
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+* **Framework:** Laravel 10.x com PHP 8.1+.
+* **Frontend Reativo:** Livewire 3 e Alpine.js para interfaces dinâmicas.
+* **Estilização:** Tailwind CSS.
+* **Banco de Dados:** MySQL/PostgreSQL com suporte a logs de auditoria via Spatie Activitylog.
+* **Integrações:** * **Orthanc:** Integração via API REST para sincronização de estudos DICOM.
+    * **SOC:** Integração via SOAP/WSS para upload automático de laudos em PDF.
 
-## Learning Laravel
+## 🛠️ Arquitetura do Sistema
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1. Fluxo de Dados DICOM (Orthanc)
+O sistema utiliza o `OrthancService` para realizar a comunicação com o servidor de imagens:
+* **Sincronização:** Busca recursiva de Estudos, Séries e Instâncias.
+* **Tratamento de Dados:** Limpeza de tags DICOM (como o separador `^` em nomes de pacientes) antes da persistência no banco local.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 2. Gestão de Laudos
+A emissão de laudos é automatizada pelo `LaudoService`:
+* **Templates:** Utiliza arquivos `.docx` como base para preenchimento de placeholders.
+* **Assinatura Digital:** Insere dinamicamente a imagem da assinatura do médico responsável.
+* **Conversão:** Transforma o documento final em PDF para armazenamento e entrega.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 3. Integração SOC (Saúde Ocupacional)
+O `UploadLaudoSocService` gerencia o envio de documentos para o sistema SOC utilizando segurança avançada:
+* **Autenticação WSS:** Geração de *Password Digest*, *Nonce* e *Timestamp* conforme padrão WS-Security.
+* **Upload GED:** Envio de laudos vinculados ao código sequencial da ficha do funcionário.
 
-## Laravel Sponsors
+## 📡 API Reference
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+O sistema disponibiliza endpoints protegidos por `API Bearer Token` para integração externa:
 
-### Premium Partners
+| Endpoint | Método | Descrição |
+| :--- | :--- | :--- |
+| `/api/exames` | `GET` | Lista exames com filtros de status. |
+| `/api/exames/{id}` | `GET` | Detalhes completos de um estudo e suas séries. |
+| `/api/exames/laudar/{id}` | `POST` | Processa e registra o laudo de uma série. |
+| `/api/medico/cadastrar` | `POST` | Cadastro simplificado de profissionais médicos. |
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## 🔐 Segurança e Níveis de Acesso
 
-## Contributing
+O acesso é controlado pelo middleware `CheckUserType`, que valida o perfil do usuário:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+* **Admin/Dev:** Gestão de usuários, tokens de API e configurações de integração.
+* **Médico:** Acesso à lista de exames pendentes e ferramentas de laudo.
+* **Técnico:** Visualização e triagem de exames.
+* **Paciente:** Acesso restrito via protocolo e senha para download de resultados.
 
-## Code of Conduct
+## ⚙️ Configuração do Ambiente
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+1.  **Instalação:**
+    ```bash
+    composer install
+    npm install && npm run build
+    ```
+2.  **Variáveis de Ambiente (`.env`):**
+    * `ORTHANC_SERVER`: URL do servidor Orthanc.
+    * `COD_EMPRESA_SOC`: Código identificador no sistema SOC.
+3.  **Banco de Dados:**
+    ```bash
+    php artisan migrate --seed
+    ```
 
-## Security Vulnerabilities
+## 📝 Regras de Negócio Importantes
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+* **Recálculo de Status:** O status de um estudo (`pendente`, `andamento`, `laudado`, `rejeitado`) é atualizado automaticamente sempre que uma série vinculada sofre alteração.
+* **Vínculo Médico:** Ao cadastrar um usuário como "Médico", o sistema exige ou cria um perfil em `medicos_laudo` para gerenciar CRM e especialidade.
+* **Auditoria:** Todas as ações críticas (edição de laudos, deleção de exames) são registradas para conformidade legal e médica.
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+Desenvolvido para **SEGMETRE - Radiology Information System**.

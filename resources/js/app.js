@@ -1,10 +1,7 @@
 import './bootstrap';
 
-import Alpine from 'alpinejs';
-
-window.Alpine = Alpine;
-
-Alpine.start();
+// Livewire 3 já inclui o Alpine.js automaticamente
+// Não precisamos inicializar manualmente para evitar conflitos
 
 // Carregar gráficos da dashboard se estiver na página
 if (document.getElementById('examesTempoChart') || 

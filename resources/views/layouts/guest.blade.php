@@ -39,5 +39,6 @@
                 </p>
             </div>
         </div>
+        @livewireScripts
     </body>
 </html>

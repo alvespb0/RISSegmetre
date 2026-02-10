@@ -4,6 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Crypt;
+
+use App\Models\Serie;
+use App\Models\Study;
+use Illuminate\Support\Facades\Storage;
 
 class ExameController extends Controller
 {
@@ -12,62 +18,63 @@ class ExameController extends Controller
      */
     public function index(Request $request): View
     {
-        // Dados de exemplo - depois pode ser substituído por consulta ao banco
-        $exames = [
-            [
-                'id' => '1',
-                'status' => 'urgente',
-                'nome_paciente' => 'Maria Silva Santos',
-                'data_exame' => '07/01/2026 14:30',
-                'modalidade' => 'RX - Tórax PA',
-                'medico_solicitante' => 'Dr. João Pereira'
-            ],
-            [
-                'id' => '2',
-                'status' => 'pendente',
-                'nome_paciente' => 'José Carlos Oliveira',
-                'data_exame' => '07/01/2026 13:15',
-                'modalidade' => 'RX - Abdome',
-                'medico_solicitante' => 'Dra. Ana Costa'
-            ],
-            [
-                'id' => '3',
-                'status' => 'laudado',
-                'nome_paciente' => 'Pedro Henrique Lima',
-                'data_exame' => '07/01/2026 10:00',
-                'modalidade' => 'RX - Coluna Lombar',
-                'medico_solicitante' => 'Dr. Carlos Mendes'
-            ],
-            [
-                'id' => '4',
-                'status' => 'pendente',
-                'nome_paciente' => 'Fernanda Rodrigues',
-                'data_exame' => '06/01/2026 16:45',
-                'modalidade' => 'RX - Joelho D',
-                'medico_solicitante' => 'Dr. João Pereira'
-            ],
-            [
-                'id' => '5',
-                'status' => 'rejeitado',
-                'nome_paciente' => 'Lucas Martins',
-                'data_exame' => '06/01/2026 15:20',
-                'modalidade' => 'RX - Tórax AP',
-                'medico_solicitante' => 'Dra. Silvane Andrade'
-            ],
-        ];
+        return view('exames.index');
+    }
 
-        // Aplicar filtro se houver
-        $filtro = $request->get('filtro', 'todos');
-        
-        if ($filtro === 'pendentes') {
-            $exames = array_values(array_filter($exames, fn($e) => $e['status'] === 'pendente'));
-        } elseif ($filtro === 'urgentes') {
-            $exames = array_values(array_filter($exames, fn($e) => $e['status'] === 'urgente'));
-        } elseif ($filtro === 'meus') {
-            $exames = array_values(array_filter($exames, fn($e) => $e['status'] !== 'laudado'));
+    public function getDicomFile($idEnc){
+        $id = Crypt::decryptString($idEnc);
+
+        $endPoint = env('ORTHANC_SERVER').'/instances'.'/'.$id.'/file';
+
+        try{
+            $response = Http::withBasicAuth(env('ORTHANC_USER'), env('ORTHANC_PASS'))->get($endPoint);
+
+            if(!$response->ok()){
+                \Log::error('Não localizado instância para endpoint informado.', ['endpoint' => $endPoint]);
+                 abort(500);
+            }
+
+            return response($response->body(), 200, [
+                'Content-Type' => 'application/dicom',
+                'Content-Disposition' => 'attachment; filename="exame-' . $id . '.dcm"',
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0',
+            ]);
+        }catch(\Exception $e){
+            \Log::error('Erro ao baixar imagem DCM: ' . $id . ', erro: '. $e->getMessage());
+            abort(500);
+        }
+    }
+
+    public function getLaudoFile($idEnc){
+        $id = Crypt::decryptString($idEnc);
+
+        $serie = Serie::findOrFail($id);
+
+        $path = $serie->laudo()->where('ativo', true)->first()?->laudo_path;
+
+        if (!Storage::exists($path)) {
+            \Log::error("Erro ao baixar laudo da serie: {$id}, path inexistente");
+            abort(404);
         }
 
-        return view('exames.index', compact('exames', 'filtro'));
+        return Storage::download($path);
+    }
+
+    public function getProtocoloFile($idEnc){
+        $id = Crypt::decryptString($idEnc);
+
+        $serie = Serie::findOrFail($id);
+
+        $path = $serie->protocolo->protocolo_path;
+
+        if(!file_exists($path)){
+            \Log::error('Erro ao baixar Protocolo de entrega da serie: '.$id.', path inexistente');
+            abort(500);
+        }
+
+        return response()->download($path);
     }
 }
 

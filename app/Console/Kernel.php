@@ -5,6 +5,10 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
+use App\Jobs\OrthancSyncJob;
+use App\Jobs\SocJob;
+use App\Jobs\EmpresasSocJob;
+
 class Kernel extends ConsoleKernel
 {
     /**
@@ -12,7 +16,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->job(new OrthancSyncJob)->everyMinute();
+        $schedule->job(new SocJob)->everyMinute();
+        $schedule->job(new EmpresasSocJob)->dailyAt('03:00');
     }
 
     /**

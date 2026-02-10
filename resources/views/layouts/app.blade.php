@@ -9,8 +9,10 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @livewireStyles
     </head>
     <body class="font-sans antialiased">
+
         <div class="flex h-screen overflow-hidden bg-background">
             @include('components.sidebar')
 
@@ -23,6 +25,8 @@
             </div>
         </div>
 
-        @stack('scripts')
+        <!-- Toast Notifications -->
+        @include('components.toast-notifications')
+        @livewireScripts
     </body>
 </html>

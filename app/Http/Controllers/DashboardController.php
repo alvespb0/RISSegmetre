@@ -2,55 +2,197 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
 
+use Illuminate\View\View;
+use App\Models\Study;
+use App\Models\Serie;
+use Carbon\Carbon;
+
+/**
+ * Controller responsável pelo Dashboard do sistema.
+ *
+ * Centraliza a coleta de métricas, estatísticas e dados agregados
+ * relacionados a exames, laudos e desempenho geral.
+ *
+ * OBS: Algumas métricas ainda utilizam dados hardcoded
+ * enquanto o modelo final de negócio está em construção.
+ */
 class DashboardController extends Controller
 {
     /**
-     * Display the dashboard.
+     * Exibe a página principal do dashboard.
+     *
+     * Coleta estatísticas gerais, dados temporais, distribuição por status,
+     * partes examinadas e métricas de performance para renderização
+     * dos gráficos e cards do dashboard.
+     *
+     * @return View
      */
     public function index(): View
     {
-        // Dados para os cards de estatísticas
-        $stats = [
-            'exames_pendentes' => 24,
-            'exames_hoje' => 48,
-            'laudos_concluidos' => 156,
-            'urgentes' => 3,
-        ];
+        $stats = $this->getNumExames();
 
-        // Dados para o gráfico de Exames e Laudos - Última Semana
-        $examesTempo = [
-            'labels' => ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
-            'exames' => [42, 38, 45, 52, 48, 35, 28],
-            'laudos' => [38, 35, 42, 48, 45, 32, 25],
-        ];
+        $examesTempo = $this->getNumExamesDia();
 
-        // Dados para o gráfico de Distribuição por Status
         $examesStatus = [
-            'labels' => ['Laudados', 'Pendentes', 'Urgentes', 'Rejeitados'],
-            'data' => [156, 24, 3, 5],
+            'labels' => ['Laudados', 'Pendentes', 'Rejeitados'],
+            'data' => [$this->getNumLaudados(), $this->getNumPendentes(), $this->getNumRejeitados()],
         ];
 
-        // Dados para o gráfico de Exames por Modalidade
-        $examesModalidade = [
-            'labels' => ['RX Tórax', 'RX Coluna', 'RX Abdome', 'RX Extremidades', 'USG', 'TC', 'RM'],
-            'data' => [45, 32, 28, 22, 35, 18, 12],
-        ];
+        $examesBodyPartExamined = $this->examesPorParte();
 
         // Dados para o gráfico de Performance de Laudos
-        $performanceLaudos = [
-            'labels' => ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-            'data' => [4.2, 3.8, 3.5, 3.2, 2.9, 2.7, 2.5, 2.4, 2.3, 2.2, 2.1, 2.0],
-        ];
+        $performanceLaudos = $this->getNumExamesRejeitadosMes();
 
         return view('dashboard', compact(
             'stats',
             'examesTempo',
             'examesStatus',
-            'examesModalidade',
+            'examesBodyPartExamined',
             'performanceLaudos'
         ));
+    }
+    
+    private function getNumExamesRejeitadosMes(): array{
+        $rejeitados = Study::query()
+            ->selectRaw('YEAR(study_date) as ano')
+            ->selectRaw('MONTH(study_date) as mes')
+            ->selectRaw('COUNT(*) as total')
+            ->whereHas('serie.instance', fn ($q) =>
+                $q->where('status', 'rejeitado')
+            )
+            ->groupBy('ano', 'mes')
+            ->orderBy('ano')
+            ->orderBy('mes')
+            ->get();
+
+        return [
+            'labels' => $rejeitados->map(
+                fn ($item) => sprintf('%02d/%d', $item->mes, $item->ano)
+            ),
+            'data' => $rejeitados->pluck('total')
+        ];
+    }
+    /**
+     * Retorna a quantidade de exames por dia (baseado na data do estudo),
+     * incluindo o total geral e o total de exames laudados.
+     *
+     * Utilizado para gráficos temporais (linha / área).
+     *
+     * @return array{
+     *     labels: \Illuminate\Support\Collection,
+     *     data: \Illuminate\Support\Collection,
+     *     laudados: \Illuminate\Support\Collection
+     * }
+     */
+    private function getNumExamesDia(): array{
+        $result = Study::selectRaw('study_date, count(*) as total')
+            ->groupBy('study_date')
+            ->orderBy('study_date')
+            ->get();
+            
+        $laudados = Study::selectRaw('study_date, count(*) as total')
+            ->whereHas('serie.instance', function ($q) {
+                $q->where('status', 'laudado');
+            })
+            ->groupBy('study_date')
+            ->orderBy('study_date')
+            ->get();
+
+        return [
+            'labels' => $result->pluck('study_date'),
+            'data'   => $result->pluck('total'),
+            'laudados' => $laudados->pluck('total')
+        ];
+    }
+
+    /**
+     * Retorna a distribuição de exames por parte do corpo examinada.
+     *
+     * Utilizado para gráficos de pizza ou barras.
+     *
+     * @return array{
+     *     labels: \Illuminate\Support\Collection,
+     *     data: \Illuminate\Support\Collection
+     * }
+     */
+    private function examesPorParte(): array{
+        $resultado = Serie::query()
+            ->selectRaw('body_part_examined, COUNT(*) as total')
+            ->groupBy('body_part_examined')
+            ->orderBy('body_part_examined')
+            ->get();
+
+        return [
+            'labels' => $resultado->pluck('body_part_examined')->values(),
+            'data'   => $resultado->pluck('total')->values(),
+        ];
+    }
+ 
+    /**
+     * Retorna os principais indicadores numéricos do dashboard.
+     *
+     * Inclui exames pendentes, exames do dia, laudos concluídos
+     * e exames rejeitados.
+     *
+     * @return array{
+     *     exames_pendentes: int,
+     *     exames_hoje: int,
+     *     laudos_concluidos: int,
+     *     exames_rejeitados: int
+     * }
+     */
+    private function getNumExames(): array{
+        $examesPendentes = $this->getNumPendentes();
+
+        $examesHoje = Study::where('study_date', now()->toDateString())->count();
+
+        $examesLaudados = $this->getNumLaudados();
+
+        $examesRejeitados = $this->getNumRejeitados();
+
+        $stats = [
+            'exames_pendentes' => $examesPendentes,
+            'exames_hoje' => $examesHoje,
+            'laudos_concluidos' => $examesLaudados,
+            'exames_rejeitados' => $examesRejeitados,
+        ];
+
+        return $stats;
+    }
+
+    /**
+     * Retorna o número de exames com instâncias em status "pendente".
+     *
+     * @return int
+     */
+    private function getNumPendentes(): int{
+        return Study::with(['serie.instance'])->whereHas('serie.instance', function($q){
+            $q->where('status', 'pendente');
+        })->count();
+    }
+
+    /**
+     * Retorna o número de exames com instâncias em status "laudado".
+     *
+     * @return int
+     */
+    private function getNumLaudados(): int{
+        return Study::with(['serie.instance'])->whereHas('serie.instance', function($q){
+            $q->where('status', 'laudado');
+        })->count();
+    }
+
+    /**
+     * Retorna o número de exames com instâncias em status "rejeitado".
+     *
+     * @return int
+     */
+    private function getNumRejeitados(){
+        return Study::with(['serie.instance'])->whereHas('serie.instance', function($q){
+            $q->where('status', 'rejeitado');
+        })->count();
     }
 }
 
