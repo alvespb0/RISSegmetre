@@ -17,9 +17,11 @@ Route::middleware('guest')->group(function () {
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
-    // Login de paciente via protocolo
     Route::post('patient/login', [\App\Http\Controllers\Auth\PatientLoginController::class, 'store'])
                 ->name('patient.login');
+
+    Route::get('login/patient/protocolo-entrega/{protocol}', [\App\Http\Controllers\Auth\PatientLoginController::class, 'loginViewByProtocol'])
+                ->name('patient.login.protocol');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
                 ->name('password.request');
