@@ -266,13 +266,16 @@ class ExameController extends Controller
 
             $serie->study->recalculateStatus();
 
-            Laudo::create([
+            $laudo = Laudo::create([
                 'serie_id' => $serie->id,
                 'medico_id' => $request->medico_id,
                 'empresa_id' => $medico->empresa->id ?? null,
                 'laudo' => $request->laudo_texto,
                 'laudo_path' => $filePath,
+                'laudo_assinado' => true,
             ]);
+
+            \Log::debug($laudo);
 
             dispatch(new \App\Jobs\SocJob());
 
