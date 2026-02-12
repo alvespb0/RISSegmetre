@@ -11,6 +11,7 @@ use App\Models\DeliveryProtocol;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use Illuminate\Support\Facades\Hash;
+use chillerlan\QRCode\Data\QRMatrix;
 
 class ProtocoloService
 {
@@ -32,7 +33,8 @@ class ProtocoloService
         } while (DeliveryProtocol::where('protocolo', $protocolo)->exists());
 
         $senhaPlana = Str::random(8);
-        $urlProtocol = env('APP_URL') . '/protocolo-entrega'.'/' . $protocolo;
+        $url = env('APP_URL');
+        $urlProtocol = $url.'/login/patient/protocolo-entrega'.'/' . $protocolo;
 
         // 2. Preparar Diretórios
         $uuid = Str::uuid()->toString();
@@ -45,16 +47,20 @@ class ProtocoloService
         $qrCodePath = "{$tmpDir}/qrcode.png";
         
         $options = new QROptions([
-            'version'      => 5, 
-            'outputType'   => QRCode::OUTPUT_IMAGE_PNG, // Força saída PNG
-            'eccLevel'     => QRCode::ECC_L, 
-            'scale'        => 10,   // Tamanho dos "pixels" (aumenta a resolução)
-            'imageBase64'  => false, // Queremos os dados binários, não base64
+            'version'          => QRCode::VERSION_AUTO,
+            'outputType'       => QRCode::OUTPUT_IMAGE_PNG,
+            'eccLevel'         => QRCode::ECC_Q,
+            'scale'            => 10,
+            'imageBase64'      => false,
+            'imageTransparent' => false, 
+            'bgColor'          => [255, 255, 255],     
+            'addQuietzone'     => true,
+            'quietzoneSize'    => 4,
         ]);
 
-        // Renderiza e salva o arquivo diretamente
         $qrcode = new QRCode($options);
-        $qrcode->render($urlProtocol, $qrCodePath);
+        $qrBinary = $qrcode->render($urlProtocol);
+        file_put_contents($qrCodePath, $qrBinary);
 
         // ================= DADOS =================
         $paciente  = $serie->study->patient->nome ?? 'N/A';
@@ -76,12 +82,12 @@ class ProtocoloService
         $template->setValue('dtExame', $dataExame);
         $template->setValue('protocolo', $protocolo);
         $template->setValue('senha', $senhaPlana);
+        $template->setValue('url', $url);
 
         // Insere a imagem (Agora é um PNG real e válido)
         $template->setImageValue('qrCode', [
             'path'   => $qrCodePath,
             'width'  => 150,
-            'height' => 150,
             'ratio'  => true,
         ]);
 

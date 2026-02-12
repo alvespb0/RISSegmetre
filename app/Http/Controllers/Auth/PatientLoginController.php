@@ -74,4 +74,13 @@ class PatientLoginController extends Controller
             ->with('mensagem', 'Você saiu com sucesso.');
     }
 
+    public function loginViewByProtocol($protocol){
+        $protocolo = DeliveryProtocol::where('protocolo', $protocol)->first();
+
+        if(!$protocolo){
+            return abort(404);
+        }
+
+        return view('auth/login-patient', ['protocol' => $protocolo]);
+    }
 }
