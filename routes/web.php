@@ -25,7 +25,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['checkUserType:admin,dev,medico,tecnico'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/', [ExameController::class, 'index'])->name('exames.index');
-    Route::get('/pacientes', function () { return view('pacientes.index'); })->name('pacientes.index');
+    Route::get('/pacientes', function () {
+                $patients = \App\Models\Patient::withCount('study')->orderBy('nome')->paginate(15); return view('pacientes.index', ['patients' => $patients]); 
+         })->name('pacientes.index');
     Route::get('/relatorios', function () { return view('relatorios.index'); })->name('relatorios.index');
     Route::get('/configuracoes', function () { return view('configuracoes.index'); })->name('configuracoes.index');
 });
