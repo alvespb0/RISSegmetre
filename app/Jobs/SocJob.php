@@ -31,10 +31,7 @@ class SocJob implements ShouldQueue
         $series = Serie::whereHas('laudo', function ($q) {
                             $q->where('ativo', true);
                         })
-                        ->whereHas('study', function ($q) {
-                            $q->where('status', 'laudado')
-                            ->whereNotNull('cod_sequencial_ficha');
-                        })
+                        ->where('status', 'laudado')
                         ->where('enviado_soc', false)
                         ->get();
 
